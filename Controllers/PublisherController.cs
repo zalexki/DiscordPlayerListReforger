@@ -1,5 +1,5 @@
 using System.Text;
-using discordPlayerList.Models;
+using discordPlayerList.Models.Request;
 using discordPlayerList.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,9 +11,9 @@ namespace discordPlayerList.Controllers;
 public class PublisherController : ControllerBase
 {
     private readonly ILogger<PublisherController> _logger;
-    private readonly RabbitMq _rabbit;
+    private readonly RabbitConnection _rabbit;
 
-    public PublisherController(ILogger<PublisherController> logger, RabbitMq rabbit)
+    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit)
     {
         _logger = logger;
         _rabbit = rabbit;
@@ -22,27 +22,31 @@ public class PublisherController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> SendDiscordMsg()
     {
-        _logger.LogInformation("healthcheck");
-
+        _logger.LogInformation("healthcheck ok");
+        
         return Ok("ok");
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostRabbitMsg([FromBody] RequestJsonFromGame gameData)
+    [Consumes("application/x-www-form-urlencoded")]
+    public IActionResult PostRabbitMsg()
     {
-        _logger.LogInformation("log received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
-        var eev = Environment.GetEnvironmentVariable("RABBIT_HOST");
-
-        const string message = "Hello World!";
-        var body = Encoding.UTF8.GetBytes(message);
-
-        _rabbit.channel.BasicPublish(exchange: string.Empty,
+        var body = HttpContext.Request.Form.FirstOrDefault();
+        var gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
+        if (gameData is null)
+        {
+            return BadRequest();
+        }
+        
+        _logger.LogDebug("received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
+        
+        _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: "player_list",
             basicProperties: null,
-            body: body,
+            body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);
         
-        Console.WriteLine($"Sent {message}");
+        _logger.LogInformation("success sent json to rabbit");
 
         return Ok();
     }

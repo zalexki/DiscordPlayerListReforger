@@ -4,18 +4,41 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DiscordPlayerList</AssemblyName>
+    <RootNamespace>DiscordPlayerList</RootNamespace>
+    <PackageId>DiscordPlayerList</PackageId>
+    <Authors>zalexki</Authors>
+    <Company />
+    <Product />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-  </ItemGroup>
 
+    <None Remove=".docker-conf" />
+
+    <None Update=".env.local">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
+    <None Remove="Properties\launchSettings.json" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(Configuration)' != 'Release' ">
+    <None Update=".env">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update=".env.local">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
   <ItemGroup>
-    <Folder Include="Factory\" />
+    <Folder Include="docker\" />
   </ItemGroup>
-
 </Project>
