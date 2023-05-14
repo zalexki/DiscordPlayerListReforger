@@ -6,10 +6,14 @@ COPY . ./
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release --self-contained --os linux-x64
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
-COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "discordPlayerList.dll"]
+COPY --from=build-env /App/bin/Release .
+
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+
+ENTRYPOINT ["dotnet", "DiscordPlayerList.dll"]

@@ -17,4 +17,12 @@ public static class RabbitToDiscordConverter
 
         return contentStringBuild.ToString();
     }
+
+    public static string GetMissionData(ServerGameData data)
+    {
+        var contentStringBuild = new StringBuilder();
+        contentStringBuild.Append($"name: {data.MissionName}");
+        
+        return contentStringBuild.ToString();
+    }
 }

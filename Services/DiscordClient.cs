@@ -31,29 +31,24 @@ public class DiscordClient
             }
 
             var userBotId = _client.CurrentUser.Id;
-            var messages = chanText.GetMessagesAsync();
-            var firstPage = await messages.FirstAsync();
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var embed = new EmbedBuilder();
 
             embed
                 .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data))
-                .WithFooter(footer => footer.Text = "Powered by FFR team")
+                .AddField("Mission data", RabbitToDiscordConverter.GetMissionData(data))
+                // .WithFooter(footer => footer.Text = "Powered by Sen")
                 .WithColor(Color.DarkTeal)
-                .WithTitle($"-- ServerName -- [{data.PlayerCount}/{data.MaxPlayerCount}]")
+                .WithTitle($"-- {data.DiscordChannelName} -- [{data.PlayerCount}/{data.MaxPlayerCount}]")
                 .WithCurrentTimestamp();
 
-            if (firstPage is not null)
+            var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
+            if (botMessages.Any())
             {
-                var botMessages = firstPage.Where(x => x.Author.Id == userBotId);
                 var first = botMessages.First();
                 
-                foreach (var message in botMessages)
+                foreach (var message in botMessages.Where(message => first.Id != message.Id))
                 {
-                    if (first.Id == message.Id)
-                    {
-                        continue;
-                    }
-                
                     await chanText.DeleteMessageAsync(message.Id);
                 }
                 
@@ -67,7 +62,7 @@ public class DiscordClient
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "failed to send msg");
+            _logger.LogError(e, "failed to send discord msg");
             return false;
         }
         

@@ -4,11 +4,11 @@ name: "ReforgerToDiscordPlayerList"
 
 services:
   # user guest/guest
-  rabbitmq:
+  rabbit:
     image: rabbitmq:3-management
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - ./docker/volumes/rabbitmq/data/:/var/lib/rabbitmq/
       - ./docker/volumes/rabbitmq/log/:/var/log/rabbitmq/

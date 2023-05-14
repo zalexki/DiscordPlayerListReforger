@@ -11,7 +11,7 @@ public class RabbitConsumer : BackgroundService
     private readonly DiscordClient _discord;
     private readonly ILogger<RabbitConsumer> _logger;
     private readonly IModel _channel;
-    private const string QueueName = "arma_reforger_discord_player_list";
+    public const string QueueName = "arma_reforger_discord_player_list";
 
     public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnection rabbitConnection, DiscordClient discord)
     {
@@ -37,7 +37,7 @@ public class RabbitConsumer : BackgroundService
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
     {
         var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-        _logger.LogDebug($"RabbitConsumer received: {rabbitMessage}");
+        _logger.LogDebug("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
 
         var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
         if (data is not null)
@@ -46,7 +46,7 @@ public class RabbitConsumer : BackgroundService
         }
         else
         {
-            _logger.LogError($"failed to deserialize message: {rabbitMessage}");
+            _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
             _channel.BasicNack(deliveryTag: eventArgs.DeliveryTag, multiple: false, requeue: false);
             return;
         }
@@ -65,6 +65,7 @@ public class RabbitConsumer : BackgroundService
         try
         {
             var c = new AsyncEventingBasicConsumer(_channel);
+
             c.Received += OnReceived;
             _channel.BasicConsume(queue: QueueName, autoAck: false, consumer: c);
         }

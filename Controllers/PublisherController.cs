@@ -41,7 +41,7 @@ public class PublisherController : ControllerBase
         _logger.LogDebug("received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
-            routingKey: "player_list",
+            routingKey: RabbitConsumer.QueueName,
             basicProperties: null,
             body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);
