@@ -6,7 +6,7 @@ using RabbitMQ.Client.Events;
 
 namespace discordPlayerList.Services;
 
-public class RabbitConsumer : IHostedService, BackgroundService
+public class RabbitConsumer : BackgroundService
 {
     private readonly DiscordClient _discord;
     private readonly ILogger<RabbitConsumer> _logger;
