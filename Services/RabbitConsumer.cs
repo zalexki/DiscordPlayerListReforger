@@ -6,7 +6,7 @@ using RabbitMQ.Client.Events;
 
 namespace discordPlayerList.Services;
 
-public class RabbitConsumer : BackgroundService
+public class RabbitConsumer : IHostedService, BackgroundService
 {
     private readonly DiscordClient _discord;
     private readonly ILogger<RabbitConsumer> _logger;
@@ -20,24 +20,34 @@ public class RabbitConsumer : BackgroundService
         _channel = rabbitConnection.Connection.CreateModel();
     }
     
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            await StartConsumeRabbit();
+            _channel.QueueDeclare(queue: QueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+            // _channel.BasicQos(0, 1, false); need to learn more about this
+        
+            var c = new AsyncEventingBasicConsumer(_channel);
+            c.Received += OnReceived;
+            _channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "failed to StartConsumeRabbit");
         }
         
-        _logger.LogDebug($"RabbitConsumer started, Queue [{QueueName}] is waiting for messages.");
+        _logger.LogInformation($"RabbitConsumer started, Queue [{QueueName}] is waiting for messages.");
+        return Task.CompletedTask;
     }
 
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
     {
         var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-        _logger.LogDebug("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
+        _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
 
         var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
         if (data is not null)
@@ -47,33 +57,8 @@ public class RabbitConsumer : BackgroundService
         else
         {
             _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
-            _channel.BasicNack(deliveryTag: eventArgs.DeliveryTag, multiple: false, requeue: false);
-            return;
         }
 
-        _channel.BasicAck(deliveryTag: eventArgs.DeliveryTag, multiple: false);
-    }
-    private Task StartConsumeRabbit()
-    {
-        _channel.QueueDeclare(queue: QueueName,
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null);
-        // _channel.BasicQos(0, 1, false); need to learn more about this
-        
-        try
-        {
-            var c = new AsyncEventingBasicConsumer(_channel);
-
-            c.Received += OnReceived;
-            _channel.BasicConsume(queue: QueueName, autoAck: false, consumer: c);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e,"fucked up");
-        }
-
-        return Task.CompletedTask;
+        // _channel.BasicAck(deliveryTag: eventArgs.DeliveryTag, multiple: false);
     }
 }

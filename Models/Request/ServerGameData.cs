@@ -5,13 +5,16 @@ namespace discordPlayerList.Models.Request;
 public class ServerGameData
 {
     [JsonProperty("missionName")]
-    public string MissionName { get; init; }
+    public string? MissionName { get; init; }
 
     [JsonProperty("discordChannelId")]
-    public ulong DiscordChannelId { get; init; }
+    public ulong? DiscordChannelId { get; init; }
     
     [JsonProperty("discordChannelName")]
-    public string DiscordChannelName { get; init; }
+    public string? DiscordChannelName { get; init; }
+    
+    [JsonProperty("discordMessageTitle")]
+    public string? DiscordMessageTitle { get; init; }
     
     [JsonProperty("playerCount")]
     public int PlayerCount { get; init; }
@@ -20,14 +23,14 @@ public class ServerGameData
     public int MaxPlayerCount { get; init; }
     
     [JsonProperty("playerList")]
-    public List<PlayerInfo> PlayerList { get; init; }
+    public List<PlayerInfo>? PlayerList { get; init; }
 }
 
 public class PlayerInfo
 {
     [JsonProperty("name")]
-    public string Name { get; init; }
+    public string? Name { get; init; }
     
     [JsonProperty("platform")]
-    public string Platform { get; init; }
+    public string? Platform { get; init; }
 }

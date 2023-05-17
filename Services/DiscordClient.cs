@@ -13,15 +13,19 @@ public class DiscordClient
     {
         _logger = logger;
         _client = new DiscordSocketClient();
-        _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
-        _client.StartAsync();
     }
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
+        if (_client.LoginState == LoginState.LoggedOut)
+        {
+            await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
+            await _client.StartAsync();
+        }
+
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId);
+            var channel = await _client.GetChannelAsync((ulong) data.DiscordChannelId);
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
@@ -30,18 +34,29 @@ public class DiscordClient
                 return false;
             }
 
+            var channelName = $"{data.DiscordChannelName.Trim()}〔{data.PlayerCount}᲼᲼∕᲼᲼{data.MaxPlayerCount}〕"; 
+            await chanText.ModifyAsync(props => { props.Name = channelName;});
+            
             var userBotId = _client.CurrentUser.Id;
             var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var embed = new EmbedBuilder();
 
+            // TODO: find a way for a better presentation
             embed
-                .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data))
-                .AddField("Mission data", RabbitToDiscordConverter.GetMissionData(data))
-                // .WithFooter(footer => footer.Text = "Powered by Sen")
-                .WithColor(Color.DarkTeal)
                 .WithTitle($"-- {data.DiscordChannelName} -- [{data.PlayerCount}/{data.MaxPlayerCount}]")
+                
+                .AddField("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", "᲼᲼")
+                .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data), true)
+                .AddField("Server IP / Port", "213.202.254.147:2002", true)
+                .AddField("Runtime", "fetch runtime somewhere", true)
+                
+                .AddField("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", "᲼᲼")
+                .AddField("Mission data", RabbitToDiscordConverter.GetMissionData(data), true)
+                
+                .WithFooter(footer => footer.Text = $"Updated at {DateTime.Now:M/d/yy HH:mm:ss}")
+                .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
-
+            
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {

@@ -17,10 +17,6 @@ builder.Services.AddSwaggerGen();
 
 // Config logging
 builder.Logging.ClearProviders().AddConsole();
-if (builder.Environment.IsDevelopment())
-{
-    builder.Logging.SetMinimumLevel(LogLevel.Debug);
-}
 
 var app = builder.Build();
 

@@ -20,7 +20,7 @@ public class PublisherController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> SendDiscordMsg()
+    public IActionResult SendDiscordMsg()
     {
         _logger.LogInformation("healthcheck ok");
         
@@ -32,13 +32,15 @@ public class PublisherController : ControllerBase
     public IActionResult PostRabbitMsg()
     {
         var body = HttpContext.Request.Form.FirstOrDefault();
+        _logger.LogInformation("received body: {Body}", body.Key);
+
         var gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
-        if (gameData is null)
+        if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
             return BadRequest();
         }
         
-        _logger.LogDebug("received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
+        _logger.LogInformation("received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: RabbitConsumer.QueueName,

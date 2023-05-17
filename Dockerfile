@@ -6,12 +6,12 @@ COPY . ./
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
-RUN dotnet publish -c Release --self-contained --os linux-x64
+RUN dotnet publish -c Release 
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
-COPY --from=build-env /App/bin/Release .
+COPY --from=build-env /App/bin/Release/net7.0 .
 
 ENV ASPNETCORE_URLS=http://+:5000
 EXPOSE 5000
