@@ -1,0 +1,31 @@
+version: '3.8'
+
+name: "ReforgerToDiscordPlayerList"
+
+services:
+  dotnet:
+#    restart: unless-stopped
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=test_prod
+      - RABBIT_USERNAME=test_prod
+      - RABBIT_PASSWORD=test_prod
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=3675
+
+  rabbitmq:
+#    restart: unless-stopped
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+      - "5675:5672"
+      - "15675:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=test_prod
+      - RABBITMQ_DEFAULT_PASS=test_prod

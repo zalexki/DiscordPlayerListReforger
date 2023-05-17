@@ -27,7 +27,8 @@ public class RabbitConnection
             UserName = username,
             Password = password,
             Port = port,
-            DispatchConsumersAsync = true
+            DispatchConsumersAsync = true,
+            AutomaticRecoveryEnabled = true
         };
         
         try
