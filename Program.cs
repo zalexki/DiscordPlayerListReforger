@@ -1,5 +1,8 @@
+using System.Globalization;
 using discordPlayerList.Extensions;
 using discordPlayerList.Services;
+
+CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.UseEnvironment();

@@ -1,62 +1,81 @@
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace discordPlayerList.Models.Request;
 
 public class ServerGameData
 {
+    [Required]
     [JsonProperty("discordChannelId")]
-    public ulong? DiscordChannelId { get; init; }
+    public required ulong DiscordChannelId { get; init; }
     
+    [Required]
     [JsonProperty("discordChannelName")]
-    public string? DiscordChannelName { get; init; }
+    public required string DiscordChannelName { get; init; }
     
+    [Required]
     [JsonProperty("discordMessageTitle")]
-    public string? DiscordMessageTitle { get; init; }
+    public required string DiscordMessageTitle { get; init; }
     
+    [Required]
     [JsonProperty("serverInfos")]
-    public ServerInfo ServerInfo { get; init; }
+    public required ServerInfo ServerInfo { get; init; }
     
+    [Required]
     [JsonProperty("playerList")]
-    public List<PlayerInfo>? PlayerList { get; init; }
+    public required List<PlayerInfo> PlayerList { get; init; }
 }
 
 public class ServerInfo
 {
+    [Required]
+    [JsonProperty("serverIp")]
+    public required string ServerIp { get; init; }
+    
+    [Required]
     [JsonProperty("missionName")]
-    public string? MissionName { get; init; }
+    public required string MissionName { get; init; }
     
+    [Required]
     [JsonProperty("upTime")]
-    public string? UpTime { get; init; }
+    public required float UpTime { get; init; }
 
+    [Required]
     [JsonProperty("timeInGame")]
-    public string? TimeInGame { get; init; }
+    public required string TimeInGame { get; init; }
     
+    [Required]
     [JsonProperty("playerCount")]
-    public int PlayerCount { get; init; }
+    public required int PlayerCount { get; init; }
     
+    [Required]
     [JsonProperty("maxPlayerCount")]
-    public int MaxPlayerCount { get; init; }
+    public required int MaxPlayerCount { get; init; }
     
+    [Required]
     [JsonProperty("windSpeed")]
-    public float WindSpeed { get; init; }
+    public required float WindSpeed { get; init; }
     
+    [Required]
     [JsonProperty("windDirection")]
-    public float WindDirection { get; init; }
+    public required float WindDirection { get; init; }
     
+    [Required]
     [JsonProperty("rainIntensity")]
-    public float RainIntensity { get; init; }
-    
-
+    public required float RainIntensity { get; init; }
 }
 
 public class PlayerInfo
 {
+    [Required]
     [JsonProperty("name")]
-    public string? Name { get; init; }
+    public required string Name { get; init; }
     
+    [Required]
     [JsonProperty("platform")]
-    public string? Platform { get; init; }
+    public required string Platform { get; init; }
     
+    [Required]
     [JsonProperty("faction")]
-    public string? Faction { get; init; }
+    public required string Faction { get; init; }
 }

@@ -46,7 +46,7 @@ public class DiscordClient
                 return false;
             }
 
-            var channelName = $"{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo.MaxPlayerCount}〕"; 
+            var channelName = $"{data.DiscordChannelName?.Trim()}〔{data.ServerInfo?.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕"; 
             await chanText.ModifyAsync(props => { props.Name = channelName;});
 
             while (_client.CurrentUser is null)
@@ -54,26 +54,33 @@ public class DiscordClient
                 Thread.Sleep(100);
             }
             var userBotId = _client.CurrentUser.Id;
-            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
+            var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
+            var players = RabbitToDiscordConverter.GetPlayerList(data);
+            var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo);
+            var wind = RabbitToDiscordConverter.GetWindData(data.ServerInfo);
+            
             var embed = new EmbedBuilder();
 
-            // TODO: find a way for a better presentation
             embed
                 .WithTitle($"-- {data.DiscordMessageTitle} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data), true)
-                .AddField("Server", RabbitToDiscordConverter.GetServerData(data.ServerInfo), true)
+                .AddField("Active players", players, true)
+                .AddField("Server", server, true)
 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Mission", data.ServerInfo.MissionName, true)
+                .AddField("Mission", missionName, true)
                 .AddField("Time", data.ServerInfo.TimeInGame, true)
-                .AddField("Wind", RabbitToDiscordConverter.GetWindData(data.ServerInfo), true)
+                .AddField("Wind", wind, true)
+                
+                // empty line
+                .AddField("** **", "** **")
 
-                .WithFooter(footer => footer.Text = $"Updated at {DateTime.UtcNow:dd/MM/yy HH:mm:ss} UTC")
-                .WithColor(Color.DarkTeal);
-                // .WithCurrentTimestamp();
-            
+                .WithFooter(footer => footer.Text = "☺")
+                .WithColor(Color.DarkTeal)
+                .WithCurrentTimestamp();
+
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {

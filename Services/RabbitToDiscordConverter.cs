@@ -18,12 +18,7 @@ public static class RabbitToDiscordConverter
             data.PlayerList.ForEach(x =>
             {
                 var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
-                var factionEmoji = x.Faction switch
-                {
-                    "US" => ":flag_us:",
-                    "USSR" => ":flag_ru:", 
-                    _ => x.Faction
-                };
+                var factionEmoji = ResolveFactionKey(x.Faction);
                 contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {x.Name}");
                 contentStringBuild.AppendLine();
             });
@@ -35,9 +30,10 @@ public static class RabbitToDiscordConverter
     public static string GetWindData(ServerInfo data)
     {
         var contentStringBuild = new StringBuilder();
-        contentStringBuild.Append($"Speed: {data.WindSpeed}m/s");
+        var speed = (int) data.WindDirection;
+        contentStringBuild.Append($"Direction: {speed.ToString("D3")}°");
         contentStringBuild.AppendLine();
-        contentStringBuild.Append($"Direction: {data.WindDirection}°");
+        contentStringBuild.Append($"Speed: {(int) data.WindSpeed}m/s");
         contentStringBuild.AppendLine();
 
         return contentStringBuild.ToString();
@@ -46,11 +42,35 @@ public static class RabbitToDiscordConverter
     public static string GetServerData(ServerInfo data)
     {
         var contentStringBuild = new StringBuilder();
-        contentStringBuild.Append("IP: 213.202.254.147");
+        var upTime = new TimeSpan(0, 0, 30, (int) data.UpTime);
+        contentStringBuild.Append($"IP: {data.ServerIp}");
         contentStringBuild.AppendLine();
-        contentStringBuild.Append($"Runtime: {data.UpTime}s");
+        contentStringBuild.Append($"Runtime: {upTime}");
         contentStringBuild.AppendLine();
 
         return contentStringBuild.ToString();
+    }
+
+    private static string ResolveFactionKey(string factionKey = "")
+    {
+        return factionKey switch
+        {
+            "US" => ":flag_us:",
+            "USSR" => ":flag_ru:",
+            "FIA" => "<:FIA:1109836486536347800>",
+            _ => factionKey
+        };
+    }
+    
+    public static string ResolveShittyBohemiaMissionName(string missionName = "")
+    {
+        return missionName switch
+        {
+            "#AR-Campaign_ScenarioName_Everon" => "Conflict_Everon",
+            "#AR-Campaign_ScenarioName_Arland" => "Conflict_Arland",
+            "#AR-Editor_Mission_GM_Eden_Name" => "GM_Everon",
+            "#AR-Editor_Mission_GM_Arland_Name" => "GM_Arland",
+            _ => missionName
+        };
     }
 }
