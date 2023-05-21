@@ -70,7 +70,7 @@ public class DiscordClient
                 .AddField("Time", data.ServerInfo.TimeInGame, true)
                 .AddField("Wind", RabbitToDiscordConverter.GetWindData(data.ServerInfo), true)
 
-                .WithFooter(footer => footer.Text = $"Updated at {DateTime.Now:M/d/yy HH:mm:ss}")
+                .WithFooter(footer => footer.Text = $"Updated at {DateTime.UtcNow:M/d/yy HH:mm:ss} UTC")
                 .WithColor(Color.DarkTeal);
                 // .WithCurrentTimestamp();
             
