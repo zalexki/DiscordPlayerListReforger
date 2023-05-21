@@ -67,7 +67,7 @@ public class DiscordClient
 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Mission", data.ServerInfo.MissionName, true)
-                .AddField("Date & Time", data.ServerInfo.TimeInGame, true)
+                .AddField("Time", data.ServerInfo.TimeInGame, true)
                 .AddField("Wind", RabbitToDiscordConverter.GetWindData(data.ServerInfo), true)
 
                 .WithFooter(footer => footer.Text = $"Updated at {DateTime.Now:M/d/yy HH:mm:ss}")

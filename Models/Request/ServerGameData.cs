@@ -29,7 +29,7 @@ public class ServerInfo
     public string? UpTime { get; init; }
 
     [JsonProperty("timeInGame")]
-    public float TimeInGame { get; init; }
+    public string? TimeInGame { get; init; }
     
     [JsonProperty("playerCount")]
     public int PlayerCount { get; init; }
