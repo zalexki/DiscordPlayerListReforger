@@ -14,3 +14,4 @@ prod-up:
 ps: prod-stop
 prod-stop:
 	docker compose -f docker-compose.prod.yml down
+	

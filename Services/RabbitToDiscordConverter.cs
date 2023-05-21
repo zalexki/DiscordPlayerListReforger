@@ -67,7 +67,7 @@ public static class RabbitToDiscordConverter
         return missionName switch
         {
             "#AR-Campaign_ScenarioName_Everon" => "Conflict_Everon",
-            "#AR-Campaign_ScenarioName_Arland" => "Conflict_Arland",
+            "#AR-MainMenu_ConflictArland_Name" => "Conflict_Arland",
             "#AR-Editor_Mission_GM_Eden_Name" => "GM_Everon",
             "#AR-Editor_Mission_GM_Arland_Name" => "GM_Arland",
             _ => missionName
