@@ -33,7 +33,7 @@ public class PublisherController : ControllerBase
     {
         var body = HttpContext.Request.Form.FirstOrDefault();
         _logger.LogInformation("received body: {Body}", body.Key);
-
+    
         var gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
         if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
@@ -49,7 +49,7 @@ public class PublisherController : ControllerBase
             mandatory: true);
         
         _logger.LogInformation("success sent json to rabbit");
-
+    
         return Ok();
     }
 }

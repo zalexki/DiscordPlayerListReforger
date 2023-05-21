@@ -17,10 +17,22 @@ public class DiscordClient
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
-        if (_client.LoginState == LoginState.LoggedOut)
+        // wait for connection to be done
+        var i = 1;
+        while (_client.LoginState != LoginState.LoggedIn)
         {
-            await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
-            await _client.StartAsync();
+            if (_client.LoginState == LoginState.LoggedOut)
+            {
+                await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
+                await _client.StartAsync();
+            }
+            Thread.Sleep(1000 * i);
+            i++;
+
+            if (i > 20)
+            {
+                throw new Exception("could not connect to discord api");
+            }
         }
 
         try
@@ -34,34 +46,38 @@ public class DiscordClient
                 return false;
             }
 
-            var channelName = $"{data.DiscordChannelName.Trim()}〔{data.PlayerCount}᲼᲼∕᲼᲼{data.MaxPlayerCount}〕"; 
+            var channelName = $"{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo.MaxPlayerCount}〕"; 
             await chanText.ModifyAsync(props => { props.Name = channelName;});
-            
+
+            while (_client.CurrentUser is null)
+            {
+                Thread.Sleep(100);
+            }
             var userBotId = _client.CurrentUser.Id;
             var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var embed = new EmbedBuilder();
 
             // TODO: find a way for a better presentation
             embed
-                .WithTitle($"-- {data.DiscordChannelName} -- [{data.PlayerCount}/{data.MaxPlayerCount}]")
-                
-                .AddField("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", "᲼᲼")
+                .WithTitle($"-- {data.DiscordChannelName} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
+
+                .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data), true)
-                .AddField("Server IP / Port", "213.202.254.147:2002", true)
-                .AddField("Runtime", "fetch runtime somewhere", true)
-                
-                .AddField("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", "᲼᲼")
-                .AddField("Mission data", RabbitToDiscordConverter.GetMissionData(data), true)
-                
+                .AddField("Server", RabbitToDiscordConverter.GetServerData(data.ServerInfo), true)
+
+                .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
+                .AddField("Mission", data.ServerInfo.MissionName, true)
+                .AddField("Date & Time", data.ServerInfo.TimeInGame, true)
+                .AddField("Wind", RabbitToDiscordConverter.GetWindData(data.ServerInfo), true)
+
                 .WithFooter(footer => footer.Text = $"Updated at {DateTime.Now:M/d/yy HH:mm:ss}")
-                .WithColor(Color.DarkTeal)
-                .WithCurrentTimestamp();
+                .WithColor(Color.DarkTeal);
+                // .WithCurrentTimestamp();
             
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {
                 var first = botMessages.First();
-                
                 foreach (var message in botMessages.Where(message => first.Id != message.Id))
                 {
                     await chanText.DeleteMessageAsync(message.Id);
@@ -73,7 +89,6 @@ public class DiscordClient
             {
                 await chanText.SendMessageAsync(embed: embed.Build());
             }
-
         }
         catch (Exception e)
         {

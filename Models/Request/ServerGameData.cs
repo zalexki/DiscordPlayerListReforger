@@ -4,9 +4,6 @@ namespace discordPlayerList.Models.Request;
 
 public class ServerGameData
 {
-    [JsonProperty("missionName")]
-    public string? MissionName { get; init; }
-
     [JsonProperty("discordChannelId")]
     public ulong? DiscordChannelId { get; init; }
     
@@ -16,14 +13,40 @@ public class ServerGameData
     [JsonProperty("discordMessageTitle")]
     public string? DiscordMessageTitle { get; init; }
     
+    [JsonProperty("serverInfos")]
+    public ServerInfo ServerInfo { get; init; }
+    
+    [JsonProperty("playerList")]
+    public List<PlayerInfo>? PlayerList { get; init; }
+}
+
+public class ServerInfo
+{
+    [JsonProperty("missionName")]
+    public string? MissionName { get; init; }
+    
+    [JsonProperty("upTime")]
+    public string? UpTime { get; init; }
+
+    [JsonProperty("timeInGame")]
+    public float TimeInGame { get; init; }
+    
     [JsonProperty("playerCount")]
     public int PlayerCount { get; init; }
     
     [JsonProperty("maxPlayerCount")]
     public int MaxPlayerCount { get; init; }
     
-    [JsonProperty("playerList")]
-    public List<PlayerInfo>? PlayerList { get; init; }
+    [JsonProperty("windSpeed")]
+    public float WindSpeed { get; init; }
+    
+    [JsonProperty("windDirection")]
+    public float WindDirection { get; init; }
+    
+    [JsonProperty("rainIntensity")]
+    public float RainIntensity { get; init; }
+    
+
 }
 
 public class PlayerInfo
@@ -33,4 +56,7 @@ public class PlayerInfo
     
     [JsonProperty("platform")]
     public string? Platform { get; init; }
+    
+    [JsonProperty("faction")]
+    public string? Faction { get; init; }
 }

@@ -29,7 +29,7 @@ public class RabbitConsumer : BackgroundService
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
-            // _channel.BasicQos(0, 1, false); need to learn more about this
+            _channel.BasicQos(0, 5, false); //need to learn more about this
         
             var c = new AsyncEventingBasicConsumer(_channel);
             c.Received += OnReceived;

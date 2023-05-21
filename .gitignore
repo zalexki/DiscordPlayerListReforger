@@ -1,6 +1,7 @@
 .idea/
 .env.local
 docker/volumes/
+docker-compose.prod.yml
 
 # Build results
 [Dd]ebug/

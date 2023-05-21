@@ -1,6 +1,4 @@
-version: '3.9'
-
-name: "ReforgerToDiscordPlayerList"
+version: "3.9"
 
 services:
   # user guest/guest

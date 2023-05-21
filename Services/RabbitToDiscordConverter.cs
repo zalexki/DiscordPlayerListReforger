@@ -17,10 +17,14 @@ public static class RabbitToDiscordConverter
         {
             data.PlayerList.ForEach(x =>
             {
-                // <:steam:1107786853874159737>
-                // <:xbox:1107786791999787068>
-                var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>"; 
-                contentStringBuild.Append($"{emojiIconPlatform} {x.Name}");
+                var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
+                var factionEmoji = x.Faction switch
+                {
+                    "US" => ":flag_us:",
+                    "USSR" => ":flag_ru:", 
+                    _ => x.Faction
+                };
+                contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {x.Name}");
                 contentStringBuild.AppendLine();
             });
         }
@@ -28,11 +32,25 @@ public static class RabbitToDiscordConverter
         return contentStringBuild.ToString();
     }
 
-    public static string GetMissionData(ServerGameData data)
+    public static string GetWindData(ServerInfo data)
     {
         var contentStringBuild = new StringBuilder();
-        contentStringBuild.Append($"name: {data.MissionName}");
-        
+        contentStringBuild.Append($"Speed: {data.WindSpeed}m/s");
+        contentStringBuild.AppendLine();
+        contentStringBuild.Append($"Direction: {data.WindDirection}°");
+        contentStringBuild.AppendLine();
+
+        return contentStringBuild.ToString();
+    }
+
+    public static string GetServerData(ServerInfo data)
+    {
+        var contentStringBuild = new StringBuilder();
+        contentStringBuild.Append("IP: 213.202.254.147");
+        contentStringBuild.AppendLine();
+        contentStringBuild.Append($"Runtime: {data.UpTime}s");
+        contentStringBuild.AppendLine();
+
         return contentStringBuild.ToString();
     }
 }
