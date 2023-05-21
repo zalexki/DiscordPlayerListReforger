@@ -18,4 +18,4 @@ prod-stop:
 # target: bp|build-publisher        - Start dotnet worker and rabbit in docker containers
 bp:build-publisher
 build-publisher:
-	docker-compose up -d --no-deps --build dotnet
+	docker compose -f docker-compose.prod.yml up -d --no-deps --build dotnet
