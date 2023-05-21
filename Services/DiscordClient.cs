@@ -59,7 +59,7 @@ public class DiscordClient
 
             // TODO: find a way for a better presentation
             embed
-                .WithTitle($"-- {data.DiscordChannelName} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
+                .WithTitle($"-- {data.DiscordMessageTitle} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players", RabbitToDiscordConverter.GetPlayerList(data), true)
