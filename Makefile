@@ -8,7 +8,7 @@ up:
 # target: prod-up|pu           - Start dotnet worker and rabbit in docker containers
 pu: prod-up
 prod-up: 
-	docker compose -f docker-compose.prod.yml up -d --build
+	docker compose -f docker-compose.prod.yml up -d --build --force-recreate
 
 # target: prod-stop|ps         - Start dotnet worker and rabbit in docker containers
 ps: prod-stop
