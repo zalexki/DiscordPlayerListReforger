@@ -67,7 +67,10 @@ public class DiscordClient
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players", players, true)
                 .AddField("Server", server, true)
-
+                
+                // empty line
+                .AddField("** **", "** **")
+                
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Mission", missionName, true)
                 .AddField("Time", data.ServerInfo.TimeInGame, true)
