@@ -63,7 +63,10 @@ public class DiscordClient
 
             embed
                 .WithTitle($"-- {data.DiscordMessageTitle} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
-
+                
+                // empty line
+                .AddField("** **", "** **")
+                
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players", players, true)
                 .AddField("Server", server, true)
