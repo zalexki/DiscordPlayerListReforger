@@ -12,7 +12,9 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddControllers();
 builder.Services.AddSingleton<DiscordChannelList>();
 builder.Services.AddSingleton<DiscordClient>();
-builder.Services.AddSingleton<RabbitConnection>();
+builder.Services.AddSingleton<RabbitConnectionConsumer>();
+builder.Services.AddSingleton<RabbitConnectionPublisher>();
+
 builder.Services.AddHostedService<RabbitConsumer>();
 builder.Services.AddHostedService<DplBackgroundService>();
 

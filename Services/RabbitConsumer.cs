@@ -15,12 +15,12 @@ public class RabbitConsumer : BackgroundService
     private readonly IModel _channel;
     public const string QueueName = "arma_reforger_discord_player_list";
 
-    public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnection rabbitConnection, DiscordClient discord, DiscordChannelList listOfChannels)
+    public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnectionConsumer rabbitConnectionConsumer, DiscordClient discord, DiscordChannelList listOfChannels)
     {
         _logger = logger;
         _discord = discord;
         _listOfChannels = listOfChannels;
-        _channel = rabbitConnection.Connection.CreateModel();
+        _channel = rabbitConnectionConsumer.Connection.CreateModel();
     }
     
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -74,7 +74,13 @@ public class RabbitConsumer : BackgroundService
                 });
             }
 
-            await _discord.SendMessageFromGameData(data);
+            var success = await _discord.SendMessageFromGameData(data);
+            if (success)
+            {
+                _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
+            } else {
+                _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
+            }
         }
         else
         {

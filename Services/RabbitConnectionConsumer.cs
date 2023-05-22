@@ -1,23 +1,22 @@
-using Microsoft.AspNetCore.Connections;
 using RabbitMQ.Client;
 
 namespace discordPlayerList.Services;
 
-public class RabbitConnection
+public class RabbitConnectionConsumer
 {
     public IConnection Connection;
     public IModel Channel;
     private bool _connectionSuccessful = false;
-    private readonly ILogger<RabbitConnection> _logger;
+    private readonly ILogger<RabbitConnectionConsumer> _logger;
 
-    public RabbitConnection(ILogger<RabbitConnection> logger)
+    public RabbitConnectionConsumer(ILogger<RabbitConnectionConsumer> logger)
     {
         _logger = logger;
 
         TryConnectionWithRetries();
     }
 
-    private void TryConnectionWithRetries()
+    protected void TryConnectionWithRetries()
     {
         var host = Environment.GetEnvironmentVariable("RABBIT_HOST");
         var username = Environment.GetEnvironmentVariable("RABBIT_USERNAME");

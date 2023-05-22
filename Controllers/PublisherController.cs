@@ -11,9 +11,9 @@ namespace discordPlayerList.Controllers;
 public class PublisherController : ControllerBase
 {
     private readonly ILogger<PublisherController> _logger;
-    private readonly RabbitConnection _rabbit;
+    private readonly RabbitConnectionPublisher _rabbit;
 
-    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit)
+    public PublisherController(ILogger<PublisherController> logger, RabbitConnectionPublisher rabbit)
     {
         _logger = logger;
         _rabbit = rabbit;

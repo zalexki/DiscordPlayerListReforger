@@ -120,7 +120,7 @@ public class DiscordClient
             _logger.LogError(e, "failed to send discord msg");
             return false;
         }
-        
+
         return true;
     }
     
