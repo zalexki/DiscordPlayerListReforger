@@ -45,7 +45,6 @@ public class DiscordClient
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
-        // wait for connection to be done
         await WaitForConnection();
         
         try

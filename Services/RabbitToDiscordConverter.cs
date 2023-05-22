@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using System.Text;
 using discordPlayerList.Models.Request;
 
@@ -43,10 +44,21 @@ public static class RabbitToDiscordConverter
     {
         var contentStringBuild = new StringBuilder();
         var upTime = new TimeSpan(0, 0, 30, (int) data.UpTime);
+        string ping;
+        try
+        {
+            ping = PingTimeAverage(data.ServerIp.Split(":").First(), 3);
+        }
+        catch (Exception e)
+        {
+            ping = "N/A";
+        }
+
         contentStringBuild.Append($"IP: {data.ServerIp}");
         contentStringBuild.AppendLine();
         contentStringBuild.Append($"Runtime: {upTime}");
         contentStringBuild.AppendLine();
+        contentStringBuild.Append($"Ping: {ping}");
 
         return contentStringBuild.ToString();
     }
@@ -72,5 +84,22 @@ public static class RabbitToDiscordConverter
             "#AR-Editor_Mission_GM_Arland_Name" => "GM_Arland",
             _ => missionName
         };
+    }
+
+    private static string PingTimeAverage(string host, int echoNum)
+    {
+        long totalTime = 0;
+        const int timeout = 20;
+        var pingSender = new Ping ();
+
+        for (var i = 0; i < echoNum; i++)
+        { 
+            var reply = pingSender.Send(host, timeout);
+            if (reply.Status == IPStatus.Success)
+            {
+                totalTime += reply.RoundtripTime;
+            }
+        }
+        return (totalTime / echoNum).ToString();
     }
 }

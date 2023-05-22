@@ -81,4 +81,5 @@ public class RabbitConsumer : BackgroundService
             _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
         }
     }
+    
 }
