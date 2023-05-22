@@ -17,7 +17,7 @@ public class DplBackgroundService : BackgroundService
     {
         DoWork();
 
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(30));
+        using PeriodicTimer timer = new(TimeSpan.FromMinutes(3));
 
         try
         {
@@ -35,7 +35,7 @@ public class DplBackgroundService : BackgroundService
     private async void DoWork()
     {
         var list = _discordChannelList.DiscordChannels
-            .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(1)));
+            .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(5)));
 
         foreach (var discordChannelTracked in list)
         {
