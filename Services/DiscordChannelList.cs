@@ -1,6 +1,6 @@
 using DiscordPlayerList.Models;
 
-namespace discordPlayerList.Services;
+namespace DiscordPlayerList.Services;
 
 public class DiscordChannelList
 {

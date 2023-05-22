@@ -1,11 +1,11 @@
 using System.Text;
 using DiscordPlayerList.Models;
-using discordPlayerList.Models.Request;
+using DiscordPlayerList.Models.Request;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace discordPlayerList.Services;
+namespace DiscordPlayerList.Services;
 
 public class RabbitConsumer : BackgroundService
 {

@@ -1,4 +1,4 @@
-namespace discordPlayerList.Services;
+namespace DiscordPlayerList.Services;
 
 public class DplBackgroundService : BackgroundService
 {
@@ -35,7 +35,7 @@ public class DplBackgroundService : BackgroundService
     private async void DoWork()
     {
         var list = _discordChannelList.DiscordChannels
-            .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(5)));
+            .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(10)));
 
         foreach (var discordChannelTracked in list)
         {

@@ -1,6 +1,6 @@
 using System.Globalization;
-using discordPlayerList.Extensions;
-using discordPlayerList.Services;
+using DiscordPlayerList.Extensions;
+using DiscordPlayerList.Services;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 

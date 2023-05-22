@@ -1,10 +1,10 @@
 using System.Text;
-using discordPlayerList.Models.Request;
-using discordPlayerList.Services;
+using DiscordPlayerList.Models.Request;
+using DiscordPlayerList.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace discordPlayerList.Controllers;
+namespace DiscordPlayerList.Controllers;
 
 [ApiController]
 [Route("/publish")]

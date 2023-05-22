@@ -1,9 +1,9 @@
 using Discord;
 using Discord.WebSocket;
 using DiscordPlayerList.Models;
-using discordPlayerList.Models.Request;
+using DiscordPlayerList.Models.Request;
 
-namespace discordPlayerList.Services;
+namespace DiscordPlayerList.Services;
 
 public class DiscordClient
 {

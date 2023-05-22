@@ -1,6 +1,6 @@
 using RabbitMQ.Client;
 
-namespace discordPlayerList.Services;
+namespace DiscordPlayerList.Services;
 
 public class RabbitConnectionConsumer
 {

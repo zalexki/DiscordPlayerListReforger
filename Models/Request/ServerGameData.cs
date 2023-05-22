@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace discordPlayerList.Models.Request;
+namespace DiscordPlayerList.Models.Request;
 
 public class ServerGameData
 {

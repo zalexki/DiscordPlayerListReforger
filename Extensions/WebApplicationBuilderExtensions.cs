@@ -1,4 +1,4 @@
-namespace discordPlayerList.Extensions;
+namespace DiscordPlayerList.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
