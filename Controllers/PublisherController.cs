@@ -40,8 +40,6 @@ public class PublisherController : ControllerBase
             return BadRequest();
         }
         
-        _logger.LogInformation("received json: {Json}", JsonConvert.SerializeObject(gameData, Formatting.Indented));
-        
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: RabbitConsumer.QueueName,
             basicProperties: null,

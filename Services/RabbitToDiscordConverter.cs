@@ -70,7 +70,9 @@ public static class RabbitToDiscordConverter
         return factionKey switch
         {
             "US" => ":flag_us:",
+            // "RHS_US" => "RHS_:flag_us:",
             "USSR" => ":flag_ru:",
+            // "RHS_RF_MSV" => "RHS_:flag_ru:", same for us than rus ...
             "FIA" => "<:FIA:1109836486536347800>",
             _ => factionKey
         };
