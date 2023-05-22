@@ -49,43 +49,49 @@ public class RabbitConsumer : BackgroundService
 
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
     {
-        var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-        _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
+        try
+        {
+            var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
+            _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
         
 
-        var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
-        if (data is not null)
-        {
-            var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
-            if (existingChannel is not null)
+            var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
+            if (data is not null)
             {
-                existingChannel.ChannelName = data.DiscordChannelName;
-                existingChannel.IsUp = true;
-                existingChannel.LastUpdate = DateTime.UtcNow;
+                var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
+                if (existingChannel is not null)
+                {
+                    existingChannel.ChannelName = data.DiscordChannelName;
+                    existingChannel.IsUp = true;
+                    existingChannel.LastUpdate = DateTime.UtcNow;
+                }
+                else
+                {
+                    _listOfChannels.DiscordChannels.Add(new DiscordChannelTracked()
+                    {
+                        IsUp = true,
+                        ChannelId = data.DiscordChannelId,
+                        ChannelName = data.DiscordChannelName,
+                        LastUpdate = DateTime.UtcNow
+                    });
+                }
+
+                var success = await _discord.SendMessageFromGameData(data);
+                if (success)
+                {
+                    _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
+                } else {
+                    _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
+                }
             }
             else
             {
-                _listOfChannels.DiscordChannels.Add(new DiscordChannelTracked()
-                {
-                    IsUp = true,
-                    ChannelId = data.DiscordChannelId,
-                    ChannelName = data.DiscordChannelName,
-                    LastUpdate = DateTime.UtcNow
-                });
-            }
-
-            var success = await _discord.SendMessageFromGameData(data);
-            if (success)
-            {
-                _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
-            } else {
-                _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
+                _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
             }
         }
-        else
+        catch (Exception e)
         {
-            _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
+            _logger.LogError(e, "OnReceived failed");
         }
     }
-    
 }
