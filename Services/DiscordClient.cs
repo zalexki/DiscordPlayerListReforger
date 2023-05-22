@@ -1,5 +1,6 @@
 using Discord;
 using Discord.WebSocket;
+using DiscordPlayerList.Models;
 using discordPlayerList.Models.Request;
 
 namespace discordPlayerList.Services;
@@ -15,26 +16,38 @@ public class DiscordClient
         _client = new DiscordSocketClient();
     }
 
+    public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
+    {
+        await WaitForConnection();
+        
+        try
+        {
+            var channel = await _client.GetChannelAsync(data.ChannelId);
+            var chanText = channel as ITextChannel;
+            if (chanText is null)
+            {
+                _logger.LogError("failed to cast to ITextChannel");
+                
+                return false;
+            }
+
+            var channelName = $"🔴{data.ChannelName.Trim()}〔0∕0〕"; 
+            await chanText.ModifyAsync(props => { props.Name = channelName;});
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "failed to send discord msg");
+            return false;
+        }
+        
+        return true;
+    }
+
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
         // wait for connection to be done
-        var i = 1;
-        while (_client.LoginState != LoginState.LoggedIn)
-        {
-            if (_client.LoginState == LoginState.LoggedOut)
-            {
-                await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
-                await _client.StartAsync();
-            }
-            Thread.Sleep(1000 * i);
-            i++;
-
-            if (i > 20)
-            {
-                throw new Exception("could not connect to discord api");
-            }
-        }
-
+        await WaitForConnection();
+        
         try
         {
             var channel = await _client.GetChannelAsync((ulong) data.DiscordChannelId);
@@ -46,7 +59,7 @@ public class DiscordClient
                 return false;
             }
 
-            var channelName = $"{data.DiscordChannelName?.Trim()}〔{data.ServerInfo?.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕"; 
+            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕"; 
             await chanText.ModifyAsync(props => { props.Name = channelName;});
 
             while (_client.CurrentUser is null)
@@ -110,5 +123,25 @@ public class DiscordClient
         }
         
         return true;
+    }
+    
+    private async Task WaitForConnection()
+    {
+        var i = 1;
+        while (_client.LoginState != LoginState.LoggedIn)
+        {
+            if (_client.LoginState == LoginState.LoggedOut)
+            {
+                await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
+                await _client.StartAsync();
+            }
+            Thread.Sleep(1000 * i);
+            i++;
+
+            if (i > 20)
+            {
+                throw new Exception("could not connect to discord api");
+            }
+        }
     }
 }

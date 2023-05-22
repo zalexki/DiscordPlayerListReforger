@@ -10,9 +10,11 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSingleton<DiscordChannelList>();
 builder.Services.AddSingleton<DiscordClient>();
 builder.Services.AddSingleton<RabbitConnection>();
 builder.Services.AddHostedService<RabbitConsumer>();
+builder.Services.AddHostedService<DplBackgroundService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
