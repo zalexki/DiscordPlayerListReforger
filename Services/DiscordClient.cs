@@ -49,7 +49,7 @@ public class DiscordClient
         
         try
         {
-            var channel = await _client.GetChannelAsync((ulong) data.DiscordChannelId);
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId);
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
@@ -70,7 +70,7 @@ public class DiscordClient
             var players = RabbitToDiscordConverter.GetPlayerList(data);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo);
             var wind = RabbitToDiscordConverter.GetWindData(data.ServerInfo);
-            
+
             var embed = new EmbedBuilder();
 
             embed
