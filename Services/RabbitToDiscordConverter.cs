@@ -49,7 +49,9 @@ public static class RabbitToDiscordConverter
         {
             ping = PingTimeAverage(data.ServerIp.Split(":").First(), 3);
             if (ping == "0")
+            {
                 ping = "1";
+            }
         }
         catch (Exception e)
         {
