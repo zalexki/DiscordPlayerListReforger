@@ -36,7 +36,7 @@ public class RabbitConnectionPublisher
         };
         
         var i = 0;
-        while (_connectionSuccessful == false || i < 20)
+        while (_connectionSuccessful == false && i < 20)
         {
             Thread.Sleep(300 * i);
             i++;
@@ -50,7 +50,6 @@ public class RabbitConnectionPublisher
             catch (Exception e)
             {
                 _logger.LogError(e, "failed to connect to rabbitmq");
-                i++;
             }
 
             if (Connection is {IsOpen: true})
