@@ -35,7 +35,7 @@ public class RabbitConnectionConsumer
         var i = 0;
         while (_connectionSuccessful == false || i <= 20)
         {
-            Task.Sleep(100 * i);
+            Task.Delay(100 * i);
             try
             {
                 Connection = factory.CreateConnection();

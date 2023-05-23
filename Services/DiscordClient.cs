@@ -63,7 +63,7 @@ public class DiscordClient
 
             while (_client.CurrentUser is null)
             {
-                Task.Sleep(100);
+                await Task.Delay(100);
             }
             var userBotId = _client.CurrentUser.Id;
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
@@ -134,7 +134,7 @@ public class DiscordClient
                 await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
                 await _client.StartAsync();
             }
-            Task.Sleep(100 * i);
+            await Task.Delay(100 * i);
             i++;
 
             if (i > 20)
