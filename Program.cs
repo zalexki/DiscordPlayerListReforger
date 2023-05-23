@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 
 builder.Services
         .AddSingleton<DiscordChannelList>()
-        .AddSingleton(new DiscordSocketConfig())
+        .AddSingleton<DiscordSocketConfig>()
         .AddSingleton<DiscordSocketClient>()
         .AddSingleton<DiscordClient>()
         .AddSingleton<RabbitConnectionConsumer>()
