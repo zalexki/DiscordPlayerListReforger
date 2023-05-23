@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Text;
 using DiscordPlayerList.Models.Request;
 using DiscordPlayerList.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DiscordPlayerList.Controllers;

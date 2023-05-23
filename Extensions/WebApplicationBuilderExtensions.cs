@@ -1,3 +1,7 @@
+using System;
+using System.IO;
+using Microsoft.AspNetCore.Builder;
+
 namespace DiscordPlayerList.Extensions;
 
 public static class WebApplicationBuilderExtensions

@@ -1,6 +1,12 @@
+using System;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;

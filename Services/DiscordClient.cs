@@ -1,7 +1,11 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordPlayerList.Services;
 

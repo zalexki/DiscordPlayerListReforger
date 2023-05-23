@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
 namespace DiscordPlayerList.Services;
@@ -29,16 +32,18 @@ public class RabbitConnectionPublisher
             UserName = username,
             Password = password,
             Port = port,
-            DispatchConsumersAsync = true,
             AutomaticRecoveryEnabled = true
         };
         
         var i = 0;
         while (_connectionSuccessful == false || i < 20)
         {
-            Task.Delay(100 * i);
+            Thread.Sleep(300 * i);
+            i++;
+
             try
             {
+                _logger.LogInformation("publisher TryConnectionWithRetries {I}", i);
                 Connection = factory.CreateConnection();
                 Channel = Connection.CreateModel();
             }
@@ -56,7 +61,7 @@ public class RabbitConnectionPublisher
 
         if (Connection is {IsOpen: false})
         {
-            throw new Exception("failed to co rabbit");
+            throw new Exception("publisher failed to co rabbit");
         }
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
 namespace DiscordPlayerList.Services;
@@ -21,7 +24,10 @@ public class RabbitConnectionConsumer
         var username = Environment.GetEnvironmentVariable("RABBIT_USERNAME");
         var password = Environment.GetEnvironmentVariable("RABBIT_PASSWORD");
         int.TryParse(Environment.GetEnvironmentVariable("RABBIT_PORT"), out var port);
-
+        _logger.LogInformation($"host {host}");
+        _logger.LogInformation($"username {username}");
+        _logger.LogInformation($"password {password}");
+        _logger.LogInformation($"port {port}");
         var factory = new ConnectionFactory
         {
             HostName = host,
@@ -33,28 +39,31 @@ public class RabbitConnectionConsumer
         };
         
         var i = 0;
-        while (_connectionSuccessful == false || i <= 20)
+        while (_connectionSuccessful == false || i < 20)
         {
-            Task.Delay(100 * i);
+            Thread.Sleep(300 * i);
+            i++;
+
             try
             {
+                _logger.LogInformation("consumer TryConnectionWithRetries {I}", i);
                 Connection = factory.CreateConnection();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "failed to connect to rabbitmq");
-                i++;
             }
 
             if (Connection is {IsOpen: true})
             {
                 _connectionSuccessful = true;
             }
+            
         }
 
         if (Connection is {IsOpen: false})
         {
-            throw new Exception("failed to co rabbit");
+            throw new Exception("consumer failed to co rabbit");
         }
     }
 }

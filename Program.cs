@@ -1,6 +1,11 @@
 using System.Globalization;
 using DiscordPlayerList.Extensions;
 using DiscordPlayerList.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -12,8 +17,6 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<DiscordChannelList>();
-        // .AddSingleton<DiscordSocketConfig>()
-        // .AddSingleton<DiscordSocketClient>()
 builder.Services.AddSingleton<DiscordClient>();
 builder.Services.AddSingleton<RabbitConnectionConsumer>();
 builder.Services.AddSingleton<RabbitConnectionPublisher>();
