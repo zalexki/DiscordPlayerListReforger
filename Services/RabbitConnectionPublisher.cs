@@ -9,11 +9,9 @@ public class RabbitConnectionPublisher
     private bool _connectionSuccessful = false;
     private readonly ILogger<RabbitConnectionPublisher> _logger;
 
-    public RabbitConnectionPublisher(ILogger<RabbitConnectionPublisher> logger, IConnection connection, IModel channel)
+    public RabbitConnectionPublisher(ILogger<RabbitConnectionPublisher> logger)
     {
         _logger = logger;
-        Connection = connection;
-        Channel = channel;
 
         TryConnectionWithRetries();
     }

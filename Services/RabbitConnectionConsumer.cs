@@ -8,10 +8,9 @@ public class RabbitConnectionConsumer
     private bool _connectionSuccessful = false;
     private readonly ILogger<RabbitConnectionConsumer> _logger;
 
-    public RabbitConnectionConsumer(ILogger<RabbitConnectionConsumer> logger, IConnection connection)
+    public RabbitConnectionConsumer(ILogger<RabbitConnectionConsumer> logger)
     {
         _logger = logger;
-        Connection = connection;
 
         TryConnectionWithRetries();
     }
