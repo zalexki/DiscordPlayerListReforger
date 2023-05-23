@@ -10,10 +10,10 @@ public class DiscordClient
     private readonly ILogger<DiscordClient> _logger;
     private readonly DiscordSocketClient _client;
     
-    public DiscordClient(ILogger<DiscordClient> logger, DiscordSocketClient client)
+    public DiscordClient(ILogger<DiscordClient> logger)
     {
         _logger = logger;
-        _client = client;
+        _client = new DiscordSocketClient();
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
