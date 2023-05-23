@@ -7,16 +7,18 @@ public class RabbitConnectionPublisher
     public IConnection Connection;
     public IModel Channel;
     private bool _connectionSuccessful = false;
-    private readonly ILogger<RabbitConnectionConsumer> _logger;
+    private readonly ILogger<RabbitConnectionPublisher> _logger;
 
-    public RabbitConnectionPublisher(ILogger<RabbitConnectionConsumer> logger)
+    public RabbitConnectionPublisher(ILogger<RabbitConnectionPublisher> logger, IConnection connection, IModel channel)
     {
         _logger = logger;
+        Connection = connection;
+        Channel = channel;
 
         TryConnectionWithRetries();
     }
 
-    protected void TryConnectionWithRetries()
+    private void TryConnectionWithRetries()
     {
         var host = Environment.GetEnvironmentVariable("RABBIT_HOST");
         var username = Environment.GetEnvironmentVariable("RABBIT_USERNAME");
@@ -34,9 +36,9 @@ public class RabbitConnectionPublisher
         };
         
         var i = 0;
-        while (_connectionSuccessful == false || i >= 10)
+        while (_connectionSuccessful == false || i < 20)
         {
-            Thread.Sleep(1000 * i);
+            Thread.Sleep(100 * i);
             try
             {
                 Connection = factory.CreateConnection();

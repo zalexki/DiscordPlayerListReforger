@@ -10,10 +10,10 @@ public class DiscordClient
     private readonly ILogger<DiscordClient> _logger;
     private readonly DiscordSocketClient _client;
     
-    public DiscordClient(ILogger<DiscordClient> logger)
+    public DiscordClient(ILogger<DiscordClient> logger, DiscordSocketClient client)
     {
         _logger = logger;
-        _client = new DiscordSocketClient();
+        _client = client;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -134,7 +134,7 @@ public class DiscordClient
                 await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
                 await _client.StartAsync();
             }
-            Thread.Sleep(1000 * i);
+            Thread.Sleep(100 * i);
             i++;
 
             if (i > 20)
