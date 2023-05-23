@@ -1,5 +1,4 @@
 using System.Globalization;
-using Discord.WebSocket;
 using DiscordPlayerList.Extensions;
 using DiscordPlayerList.Services;
 
@@ -12,16 +11,15 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services
-        .AddSingleton<DiscordChannelList>()
+builder.Services.AddSingleton<DiscordChannelList>();
         // .AddSingleton<DiscordSocketConfig>()
         // .AddSingleton<DiscordSocketClient>()
-        .AddSingleton<DiscordClient>()
-        .AddSingleton<RabbitConnectionConsumer>()
-        .AddSingleton<RabbitConnectionPublisher>()
+builder.Services.AddSingleton<DiscordClient>();
+builder.Services.AddSingleton<RabbitConnectionConsumer>();
+builder.Services.AddSingleton<RabbitConnectionPublisher>();
 
-        .AddHostedService<RabbitConsumer>()
-        .AddHostedService<DplBackgroundService>();
+builder.Services.AddHostedService<RabbitConsumer>();
+builder.Services.AddHostedService<DplBackgroundService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
