@@ -52,7 +52,7 @@ public class DplBackgroundService : BackgroundService
                 _logger.LogError(e, "failed to sendServerOff for {@DiscordChannelTracked}", discordChannelTracked);
             }
             
-            Thread.Sleep(1000);
+            Task.Sleep(1000);
         }
     }
 }
