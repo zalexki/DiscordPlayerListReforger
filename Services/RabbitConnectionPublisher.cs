@@ -9,7 +9,6 @@ public class RabbitConnectionPublisher
 {
     public IConnection Connection;
     public IModel Channel;
-    private bool _connectionSuccessful = false;
     private readonly ILogger<RabbitConnectionPublisher> _logger;
 
     public RabbitConnectionPublisher(ILogger<RabbitConnectionPublisher> logger)
@@ -36,7 +35,8 @@ public class RabbitConnectionPublisher
         };
         
         var i = 0;
-        while (_connectionSuccessful == false && i < 20)
+        var mustRetry = true;
+        while (mustRetry && i < 20)
         {
             Thread.Sleep(300 * i);
             i++;
@@ -54,7 +54,7 @@ public class RabbitConnectionPublisher
 
             if (Connection is {IsOpen: true})
             {
-                _connectionSuccessful = true;
+                mustRetry = false;
             }
         }
 

@@ -8,7 +8,6 @@ namespace DiscordPlayerList.Services;
 public class RabbitConnectionConsumer
 {
     public IConnection Connection;
-    private bool _connectionSuccessful = false;
     private readonly ILogger<RabbitConnectionConsumer> _logger;
 
     public RabbitConnectionConsumer(ILogger<RabbitConnectionConsumer> logger)
