@@ -1,6 +1,8 @@
 using System.Globalization;
 using DiscordPlayerList.Extensions;
 using DiscordPlayerList.Services;
+using DiscordPlayerList.Services.BackgroundService;
+using DiscordPlayerList.Services.Connections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +19,8 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddControllers();
 
 builder.Services
-    .AddSingleton<DiscordChannelList>()
-    .AddSingleton<DiscordClient>()
+    .AddSingleton<MemoryStorage>()
+    .AddSingleton<DiscordHelper>()
     .AddSingleton<RabbitConnectionConsumer>()
     .AddSingleton<RabbitConnectionPublisher>()
 

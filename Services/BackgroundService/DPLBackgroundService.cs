@@ -2,22 +2,21 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerList.Services.BackgroundService;
 
-public class DplBackgroundService : BackgroundService
+public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundService
 {
     private readonly ILogger<DplBackgroundService> _logger;
-    private readonly DiscordClient _discord;
-    private readonly DiscordChannelList _discordChannelList;
+    private readonly DiscordHelper _discord;
+    private readonly MemoryStorage _memoryStorage;
 
-    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordClient discord, DiscordChannelList discordChannelList)
+    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, MemoryStorage memoryStorage)
     {
         _logger = logger;
         _discord = discord;
-        _discordChannelList = discordChannelList;
+        _memoryStorage = memoryStorage;
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,7 +40,7 @@ public class DplBackgroundService : BackgroundService
     
     private async void DoWork()
     {
-        var list = _discordChannelList.DiscordChannels
+        var list = _memoryStorage.DiscordChannels
             .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(10)));
 
         foreach (var discordChannelTracked in list)

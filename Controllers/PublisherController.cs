@@ -2,6 +2,8 @@ using System.Linq;
 using System.Text;
 using DiscordPlayerList.Models.Request;
 using DiscordPlayerList.Services;
+using DiscordPlayerList.Services.BackgroundService;
+using DiscordPlayerList.Services.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

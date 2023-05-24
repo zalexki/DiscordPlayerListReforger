@@ -5,23 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
-using Microsoft.Extensions.Hosting;
+using DiscordPlayerList.Services.Connections;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerList.Services.BackgroundService;
 
-public class RabbitConsumer : BackgroundService
+public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 {
-    private readonly DiscordChannelList _listOfChannels;
-    private readonly DiscordClient _discord;
+    private readonly MemoryStorage _listOfChannels;
+    private readonly DiscordHelper _discord;
     private readonly ILogger<RabbitConsumer> _logger;
     private readonly IModel _channel;
     public const string QueueName = "arma_reforger_discord_player_list";
 
-    public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnectionConsumer rabbitConnectionConsumer, DiscordClient discord, DiscordChannelList listOfChannels)
+    public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnectionConsumer rabbitConnectionConsumer, DiscordHelper discord, MemoryStorage listOfChannels)
     {
         _logger = logger;
         _discord = discord;

@@ -2,22 +2,23 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
+using Discord.Rest;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
+using DiscordPlayerList.Services.Converter;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordPlayerList.Services;
 
-public class DiscordClient
+public class DiscordHelper
 {
-    private readonly ILogger<DiscordClient> _logger;
-    private readonly DiscordSocketClient _client;
+    private readonly ILogger<DiscordHelper> _logger;
+    private readonly DiscordRestClient _client;
     
-    public DiscordClient(ILogger<DiscordClient> logger)
+    public DiscordHelper(ILogger<DiscordHelper> logger)
     {
         _logger = logger;
-        _client = new DiscordSocketClient();
+        _client = new DiscordRestClient();
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -136,7 +137,7 @@ public class DiscordClient
             if (_client.LoginState == LoginState.LoggedOut)
             {
                 await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
-                await _client.StartAsync();
+                // await _client.StartAsync();
             }
             await Task.Delay(100 * i);
             i++;

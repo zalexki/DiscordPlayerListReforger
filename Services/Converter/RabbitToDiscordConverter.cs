@@ -4,7 +4,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using DiscordPlayerList.Models.Request;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerList.Services.Converter;
 
 public static class RabbitToDiscordConverter
 {

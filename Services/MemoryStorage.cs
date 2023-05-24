@@ -3,7 +3,7 @@ using DiscordPlayerList.Models;
 
 namespace DiscordPlayerList.Services;
 
-public class DiscordChannelList
+public class MemoryStorage
 {
     public readonly List<DiscordChannelTracked> DiscordChannels = new();
 }
