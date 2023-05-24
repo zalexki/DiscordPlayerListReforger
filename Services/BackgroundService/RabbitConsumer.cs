@@ -33,16 +33,19 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         try
         {
-            _channel.QueueDeclare(queue: QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-            _channel.BasicQos(0, 3, false); //need to learn more about this
-        
-            var c = new AsyncEventingBasicConsumer(_channel);
-            c.Received += OnReceived;
-            _channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
+            for (var i = 1; i < 10; i++)
+            {
+                _channel.QueueDeclare(queue: QueueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+                _channel.BasicQos(0, 1, false);
+            
+                var c = new AsyncEventingBasicConsumer(_channel);
+                c.Received += OnReceived;
+                _channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
+            }
         }
         catch (Exception e)
         {
