@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Rest;
+using Discord.WebSocket;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
 using DiscordPlayerList.Services.Converter;
@@ -13,12 +14,12 @@ namespace DiscordPlayerList.Services;
 public class DiscordHelper
 {
     private readonly ILogger<DiscordHelper> _logger;
-    private readonly DiscordRestClient _client;
+    private readonly DiscordSocketClient _client;
     
-    public DiscordHelper(ILogger<DiscordHelper> logger)
+    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client)
     {
         _logger = logger;
-        _client = new DiscordRestClient();
+        _client = client;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -63,8 +64,8 @@ public class DiscordHelper
                 return false;
             }
 
-            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕"; 
-            await chanText.ModifyAsync(props => { props.Name = channelName;});
+            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
             while (_client.CurrentUser is null)
             {
@@ -99,11 +100,11 @@ public class DiscordHelper
                 // empty line
                 .AddField("** **", "** **")
 
-                .WithFooter(footer => footer.Text = "☺")
+                .WithFooter(footer => footer.Text = $"{DateTime.Now.ToString()} ☺")
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
+            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {
@@ -112,12 +113,11 @@ public class DiscordHelper
                 {
                     await chanText.DeleteMessageAsync(message.Id);
                 }
-                
-                await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
+                Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
             }
             else
             {
-                await chanText.SendMessageAsync(embed: embed.Build());
+                Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
             }
         }
         catch (Exception e)
@@ -137,7 +137,7 @@ public class DiscordHelper
             if (_client.LoginState == LoginState.LoggedOut)
             {
                 await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN"));
-                // await _client.StartAsync();
+                await _client.StartAsync();
             }
             await Task.Delay(100 * i);
             i++;

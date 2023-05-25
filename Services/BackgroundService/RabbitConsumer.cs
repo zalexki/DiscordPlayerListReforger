@@ -61,17 +61,9 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         try
         {
-            String msg = null;
-            Thread thread = Thread.CurrentThread;
-            msg = String.Format("{0} thread information\n", thread.Name) +
-                  String.Format("   Background: {0}\n", thread.IsBackground) +
-                  String.Format("   Thread Pool: {0}\n", thread.IsThreadPoolThread) +
-                  String.Format("   Thread ID: {0}\n", thread.ManagedThreadId);
-            Console.WriteLine(msg);
-            
             var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
-        
+            Console.WriteLine("wtf");
 
             var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
             if (data is not null)

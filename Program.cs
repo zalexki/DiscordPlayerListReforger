@@ -1,4 +1,5 @@
 using System.Globalization;
+using Discord.WebSocket;
 using DiscordPlayerList.Extensions;
 using DiscordPlayerList.Services;
 using DiscordPlayerList.Services.BackgroundService;
@@ -20,7 +21,8 @@ builder.Services.AddControllers();
 
 builder.Services
     .AddSingleton<MemoryStorage>()
-    .AddSingleton<DiscordHelper>()
+    .AddSingleton<DiscordSocketClient>()
+    .AddScoped<DiscordHelper>()
     .AddSingleton<RabbitConnectionConsumer>()
     .AddSingleton<RabbitConnectionPublisher>()
 
