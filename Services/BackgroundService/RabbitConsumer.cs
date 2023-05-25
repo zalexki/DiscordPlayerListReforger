@@ -15,18 +15,18 @@ namespace DiscordPlayerList.Services.BackgroundService;
 
 public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 {
+    private readonly RabbitConnectionConsumer _rabbitConnectionConsumer;
     private readonly MemoryStorage _listOfChannels;
     private readonly DiscordHelper _discord;
     private readonly ILogger<RabbitConsumer> _logger;
-    private readonly IModel _channel;
     public const string QueueName = "arma_reforger_discord_player_list";
 
-    public RabbitConsumer(ILogger<RabbitConsumer> logger, RabbitConnectionConsumer rabbitConnectionConsumer, DiscordHelper discord, MemoryStorage listOfChannels)
+    public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, RabbitConnectionConsumer rabbitConnectionConsumer)
     {
         _logger = logger;
         _discord = discord;
         _listOfChannels = listOfChannels;
-        _channel = rabbitConnectionConsumer.Connection.CreateModel();
+        _rabbitConnectionConsumer = rabbitConnectionConsumer;
     }
     
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,16 +35,17 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         {
             for (var i = 1; i < 10; i++)
             {
-                _channel.QueueDeclare(queue: QueueName,
+                var channel = _rabbitConnectionConsumer.Connection.CreateModel();
+                channel.QueueDeclare(queue: QueueName,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
                     arguments: null);
-                _channel.BasicQos(0, 1, false);
+                channel.BasicQos(0, 1, false);
             
-                var c = new AsyncEventingBasicConsumer(_channel);
+                var c = new AsyncEventingBasicConsumer(channel);
                 c.Received += OnReceived;
-                _channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
+                channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
             }
         }
         catch (Exception e)
@@ -60,6 +61,14 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         try
         {
+            String msg = null;
+            Thread thread = Thread.CurrentThread;
+            msg = String.Format("{0} thread information\n", thread.Name) +
+                  String.Format("   Background: {0}\n", thread.IsBackground) +
+                  String.Format("   Thread Pool: {0}\n", thread.IsThreadPoolThread) +
+                  String.Format("   Thread ID: {0}\n", thread.ManagedThreadId);
+            Console.WriteLine(msg);
+            
             var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
         
