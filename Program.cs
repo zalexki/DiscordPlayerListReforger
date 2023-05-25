@@ -22,10 +22,11 @@ builder.Services.AddControllers();
 builder.Services
     .AddSingleton<MemoryStorage>()
     .AddSingleton<DiscordSocketClient>()
-    .AddScoped<DiscordHelper>()
     .AddSingleton<RabbitConnectionConsumer>()
     .AddSingleton<RabbitConnectionPublisher>()
 
+    .AddScoped<DiscordHelper>()
+    
     .AddHostedService<RabbitConsumer>()
     .AddHostedService<DplBackgroundService>();
 

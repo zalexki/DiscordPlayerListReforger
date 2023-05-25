@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
 using DiscordPlayerList.Models;
 using DiscordPlayerList.Models.Request;
@@ -100,7 +99,7 @@ public class DiscordHelper
                 // empty line
                 .AddField("** **", "** **")
 
-                .WithFooter(footer => footer.Text = $"{DateTime.Now.ToString()} ☺")
+                .WithFooter(footer => footer.Text = "☺")
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 

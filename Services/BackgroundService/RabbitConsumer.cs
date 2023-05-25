@@ -63,7 +63,6 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         {
             var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
-            Console.WriteLine("wtf");
 
             var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
             if (data is not null)
