@@ -54,7 +54,7 @@ public class DiscordHelper
         
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId);
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){ Timeout = 30000});
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
