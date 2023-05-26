@@ -33,7 +33,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         try
         {
-            for (var i = 1; i < 10; i++)
+            for (var i = 1; i < 3; i++)
             {
                 var channel = _rabbitConnectionConsumer.Connection.CreateModel();
                 channel.QueueDeclare(queue: QueueName,
