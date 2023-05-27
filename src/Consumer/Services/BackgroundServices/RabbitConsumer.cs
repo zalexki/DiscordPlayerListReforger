@@ -15,13 +15,13 @@ namespace DiscordPlayerList.Services.BackgroundService;
 
 public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 {
-    private readonly RabbitConnectionConsumer _rabbitConnectionConsumer;
+    private readonly RabbitConnection _rabbitConnectionConsumer;
     private readonly MemoryStorage _listOfChannels;
     private readonly DiscordHelper _discord;
     private readonly ILogger<RabbitConsumer> _logger;
     public const string QueueName = "arma_reforger_discord_player_list";
 
-    public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, RabbitConnectionConsumer rabbitConnectionConsumer)
+    public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, RabbitConnection rabbitConnectionConsumer)
     {
         _logger = logger;
         _discord = discord;

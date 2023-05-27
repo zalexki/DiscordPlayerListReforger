@@ -5,12 +5,12 @@ using RabbitMQ.Client;
 
 namespace DiscordPlayerList.Services.Connections;
 
-public class RabbitConnectionConsumer
+public class RabbitConnection
 {
     public IConnection Connection;
-    private readonly ILogger<RabbitConnectionConsumer> _logger;
+    private readonly ILogger<RabbitConnection> _logger;
 
-    public RabbitConnectionConsumer(ILogger<RabbitConnectionConsumer> logger)
+    public RabbitConnection(ILogger<RabbitConnection> logger)
     {
         _logger = logger;
 
