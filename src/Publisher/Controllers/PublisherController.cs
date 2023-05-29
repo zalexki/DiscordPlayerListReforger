@@ -1,14 +1,12 @@
 using System.Linq;
 using System.Text;
-using DiscordPlayerList.Models.Request;
-using DiscordPlayerList.Services;
-using DiscordPlayerList.Services.BackgroundService;
-using DiscordPlayerList.Services.Connections;
+using DiscordPlayerListPublisher.Services;
+using DiscordPlayerListShared.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DiscordPlayerList.Controllers;
+namespace DiscordPlayerListPublisher.Controllers;
 
 [ApiController]
 [Route("/publish")]
@@ -51,7 +49,7 @@ public class PublisherController : ControllerBase
                     arguments: null);
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
-            routingKey: RabbitConsumer.QueueName,
+            routingKey: "arma_reforger_discord_player_list",
             basicProperties: null,
             body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);

@@ -16,4 +16,4 @@ COPY --from=build-env /App/out .
 ENV ASPNETCORE_URLS=http://+:5000
 EXPOSE 5000
 
-ENTRYPOINT ["dotnet", "DiscordPlayerList.dll"]
+ENTRYPOINT ["dotnet", "DiscordPlayerListPublisher.dll"]

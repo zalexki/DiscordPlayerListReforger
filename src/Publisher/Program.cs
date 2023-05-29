@@ -1,9 +1,6 @@
 using System.Globalization;
-using Discord.WebSocket;
-using DiscordPlayerList.Extensions;
-using DiscordPlayerList.Services;
-using DiscordPlayerList.Services.BackgroundService;
-using DiscordPlayerList.Services.Connections;
+using DiscordPlayerListPublisher.Services;
+using DiscordPlayerListShared.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.UseEnvironment();
@@ -19,16 +17,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services
-    .AddSingleton<MemoryStorage>()
-    .AddSingleton<DiscordSocketClient>()
-    .AddSingleton<RabbitConnectionConsumer>()
-    .AddSingleton<RabbitConnectionPublisher>()
-
-    .AddScoped<DiscordHelper>()
-    
-    .AddHostedService<RabbitConsumer>()
-    .AddHostedService<DplBackgroundService>();
+builder.Services.AddSingleton<RabbitConnectionPublisher>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

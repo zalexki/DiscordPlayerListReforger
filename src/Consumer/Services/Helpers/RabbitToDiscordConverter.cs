@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
-using DiscordPlayerList.Models.Request;
+using DiscordPlayerListShared.Models.Request;
 
-namespace DiscordPlayerList.Services.Converter;
+namespace DiscordPlayerListConsumer.Services.Helpers;
 
 public static class RabbitToDiscordConverter
 {

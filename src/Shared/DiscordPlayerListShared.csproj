@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>DiscordPlayerListShared</AssemblyName>
+    <RootNamespace>DiscordPlayerListShared</RootNamespace>
+    <PackageId>DiscordPlayerListShared</PackageId>
+    <RepositoryType>git</RepositoryType>
+    <Authors>zalexki</Authors>
+    <IsPackable>true</IsPackable>
+    <OutputType>Library</OutputType>
+    <Version>1.0.3</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+
+    <None Remove=".docker-conf" />
+
+    <None Update=".env.local">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
+    <None Remove="Properties\launchSettings.json" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(Configuration)' != 'Release' ">
+    <None Update=".env">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update=".env.local">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace DiscordPlayerList.Models.Request;
+namespace DiscordPlayerListShared.Models.Request;
 
 public class ServerGameData
 {

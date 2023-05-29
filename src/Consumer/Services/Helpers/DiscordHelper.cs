@@ -3,12 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordPlayerList.Models;
-using DiscordPlayerList.Models.Request;
-using DiscordPlayerList.Services.Converter;
+using DiscordPlayerListShared.Models.Request;
+using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerListConsumer.Services.Helpers;
 
 public class DiscordHelper
 {

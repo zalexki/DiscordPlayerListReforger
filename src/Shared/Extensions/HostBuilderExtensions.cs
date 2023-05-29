@@ -1,11 +1,10 @@
 using System;
 using System.IO;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 
 namespace DiscordPlayerListShared.Extensions;
 
-public static class WebApplicationBuilderExtensions
+public static class HostBuilderExtensions
 {
     public static IHostBuilder UseEnvironment(this IHostBuilder builder)
     {       
@@ -24,23 +23,6 @@ public static class WebApplicationBuilderExtensions
         return builder;
     }
 
-    public static WebApplicationBuilder UseEnvironment(this WebApplicationBuilder builder)
-    {       
-        var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
-        if (File.Exists(file))
-        {
-            AddEnvironmentVariable(file);
-        }
-        
-        var localEnvFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env.local");
-        if (File.Exists(localEnvFile))
-        {
-            AddEnvironmentVariable(localEnvFile, overrideExisting: true);
-        }
-        
-        return builder;
-    }
-    
     private static void AddEnvironmentVariable(string filePath, bool overrideExisting = false)
     {
         var content = File.ReadLines(filePath);

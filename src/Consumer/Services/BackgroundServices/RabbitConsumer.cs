@@ -3,15 +3,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DiscordPlayerList.Models;
-using DiscordPlayerList.Models.Request;
-using DiscordPlayerList.Services.Connections;
+using DiscordPlayerListShared.Models.Request;
+using DiscordPlayerListConsumer.Models;
+using DiscordPlayerListConsumer.Services.Helpers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace DiscordPlayerList.Services.BackgroundService;
+namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
 public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 {
@@ -33,7 +33,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         try
         {
-            for (var i = 1; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 var channel = _rabbitConnectionConsumer.Connection.CreateModel();
                 channel.QueueDeclare(queue: QueueName,

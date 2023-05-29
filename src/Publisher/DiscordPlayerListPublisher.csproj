@@ -4,25 +4,19 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyName>DiscordPlayerList</AssemblyName>
-    <RootNamespace>DiscordPlayerList</RootNamespace>
-    <PackageId>DiscordPlayerList</PackageId>
+    <AssemblyName>DiscordPlayerListPublisher</AssemblyName>
+    <RootNamespace>DiscordPlayerListPublisher</RootNamespace>
+    <PackageId>DiscordPlayerListPublisher</PackageId>
     <Authors>zalexki</Authors>
-    
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
-
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-
-    <None Remove=".docker-conf" />
+    <PackageReference Include="DiscordPlayerListShared" Version="1.0.3" />
 
     <None Update=".env.local">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -38,5 +32,9 @@
     <None Update=".env.local">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\DiscordPlayerListShared.csproj" />
   </ItemGroup>
 </Project>

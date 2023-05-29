@@ -19,3 +19,8 @@ prod-stop:
 bp:build-publisher
 build-publisher:
 	docker compose -f docker-compose.prod.yml up -d --no-deps --build dotnet
+
+# target: bn|build-nuget        	- Build shared package nuget 
+bn: build-nuget
+build-nuget:
+	dotnet pack src/Shared -c Release

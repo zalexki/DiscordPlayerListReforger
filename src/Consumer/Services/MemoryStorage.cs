@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using DiscordPlayerList.Models;
+using DiscordPlayerListConsumer.Models;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerListConsumer.Services;
 
 public class MemoryStorage
 {
