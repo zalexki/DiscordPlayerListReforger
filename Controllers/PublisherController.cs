@@ -44,7 +44,7 @@ public class PublisherController : ControllerBase
             return BadRequest();
         }
 
-        _rabbit.Channel.QueueDeclare(queue: QueueName,
+        _rabbit.Channel.QueueDeclare(queue: RabbitConsumer.QueueName,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
