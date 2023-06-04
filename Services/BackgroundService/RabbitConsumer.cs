@@ -46,6 +46,8 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
                 var c = new AsyncEventingBasicConsumer(channel);
                 c.Received += OnReceived;
                 channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
+
+                _logger.LogInformation($"RabbitConsumer {i} started, Queue [{QueueName}] is waiting for messages.");
             }
         }
         catch (Exception e)
@@ -53,7 +55,6 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             _logger.LogError(e, "failed to StartConsumeRabbit");
         }
         
-        _logger.LogInformation($"RabbitConsumer started, Queue [{QueueName}] is waiting for messages.");
         return Task.CompletedTask;
     }
 
