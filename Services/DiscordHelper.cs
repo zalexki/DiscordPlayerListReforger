@@ -38,6 +38,8 @@ public class DiscordHelper
 
             var channelName = $"🔴{data.ChannelName.Trim()}〔0∕0〕"; 
             await chanText.ModifyAsync(props => { props.Name = channelName;});
+            Task.Run(() => chanText.ModifyMessageAsync(data.ChannelId, func: x => x.Content = "server offline"));
+            
         }
         catch (Exception e)
         {

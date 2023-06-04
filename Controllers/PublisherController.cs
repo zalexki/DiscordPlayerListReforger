@@ -43,6 +43,12 @@ public class PublisherController : ControllerBase
         {
             return BadRequest();
         }
+
+        _rabbit.Channel.QueueDeclare(queue: QueueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: RabbitConsumer.QueueName,
