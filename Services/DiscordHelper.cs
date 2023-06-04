@@ -44,8 +44,11 @@ public class DiscordHelper
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             var first = botMessages.First();
 
-            Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Content = "server offline"));
-            
+            var embed = new EmbedBuilder();
+            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline");
+
+            Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+            _logger.LogInformation("finished to send server off discord msg");
         }
         catch (Exception e)
         {
