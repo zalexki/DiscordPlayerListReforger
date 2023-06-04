@@ -8,8 +8,9 @@
     <RootNamespace>DiscordPlayerList</RootNamespace>
     <PackageId>DiscordPlayerList</PackageId>
     <Authors>zalexki</Authors>
-    <Company />
-    <Product />
+    
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
   </PropertyGroup>
 
   <ItemGroup>

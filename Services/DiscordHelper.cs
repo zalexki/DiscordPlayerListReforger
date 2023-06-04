@@ -38,7 +38,7 @@ public class DiscordHelper
 
             var channelName = $"🔴{data.ChannelName.Trim()}〔0∕0〕"; 
             Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName;}));
-            
+
             var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
             var userBotId = _client.CurrentUser.Id;
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
@@ -49,7 +49,7 @@ public class DiscordHelper
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "failed to send discord msg");
+            _logger.LogError(e, "failed to send server off discord msg");
             return false;
         }
         
