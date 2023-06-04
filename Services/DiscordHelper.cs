@@ -37,8 +37,14 @@ public class DiscordHelper
             }
 
             var channelName = $"🔴{data.ChannelName.Trim()}〔0∕0〕"; 
-            await chanText.ModifyAsync(props => { props.Name = channelName;});
-            Task.Run(() => chanText.ModifyMessageAsync(data.ChannelId, func: x => x.Content = "server offline"));
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName;}));
+            
+            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
+            var userBotId = _client.CurrentUser.Id;
+            var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
+            var first = botMessages.First();
+
+            Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Content = "server offline"));
             
         }
         catch (Exception e)
