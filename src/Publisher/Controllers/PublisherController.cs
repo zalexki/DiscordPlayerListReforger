@@ -42,12 +42,12 @@ public class PublisherController : ControllerBase
             return BadRequest();
         }
 
-        _rabbit.Channel.QueueDeclare(queue: RabbitConsumer.QueueName,
+        _rabbit.Channel.QueueDeclare(queue: ServerGameData.QueueName,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
                     arguments: null);
-        
+
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: "arma_reforger_discord_player_list",
             basicProperties: null,

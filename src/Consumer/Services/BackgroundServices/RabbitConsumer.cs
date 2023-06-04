@@ -19,7 +19,6 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     private readonly MemoryStorage _listOfChannels;
     private readonly DiscordHelper _discord;
     private readonly ILogger<RabbitConsumer> _logger;
-    public const string QueueName = "arma_reforger_discord_player_list";
 
     public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, RabbitConnection rabbitConnectionConsumer)
     {
@@ -36,7 +35,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             for (var i = 0; i < 3; i++)
             {
                 var channel = _rabbitConnectionConsumer.Connection.CreateModel();
-                channel.QueueDeclare(queue: QueueName,
+                channel.QueueDeclare(queue: ServerGameData.QueueName,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -45,9 +44,9 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             
                 var c = new AsyncEventingBasicConsumer(channel);
                 c.Received += OnReceived;
-                channel.BasicConsume(queue: QueueName, autoAck: true, consumer: c);
 
-                _logger.LogInformation($"RabbitConsumer {i} started, Queue [{QueueName}] is waiting for messages.");
+                channel.BasicConsume(queue: ServerGameData.QueueName, autoAck: true, consumer: c);
+                _logger.LogInformation($"RabbitConsumer {i} started, Queue [{ServerGameData.QueueName}] is waiting for messages.");
             }
         }
         catch (Exception e)

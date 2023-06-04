@@ -6,6 +6,8 @@ namespace DiscordPlayerListShared.Models.Request;
 
 public class ServerGameData
 {
+    public const string QueueName = "arma_reforger_discord_player_list";
+
     [Required]
     [JsonProperty("m_discordChannelId")]
     public required ulong DiscordChannelId { get; init; }

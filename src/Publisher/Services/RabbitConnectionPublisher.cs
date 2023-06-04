@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using DiscordPlayerListShared.Models.Request;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
@@ -46,6 +47,12 @@ public class RabbitConnectionPublisher
                 _logger.LogInformation("publisher TryConnectionWithRetries {I}", i);
                 Connection = factory.CreateConnection();
                 Channel = Connection.CreateModel();
+
+                Channel.QueueDeclare(queue: ServerGameData.QueueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
             }
             catch (Exception e)
             {
