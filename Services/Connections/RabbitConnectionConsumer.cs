@@ -36,7 +36,7 @@ public class RabbitConnectionConsumer
         
         var i = 0;
         var mustRetry = true;
-        while (mustRetry && i > 20)
+        while (mustRetry && i < 20)
         {
             Thread.Sleep(300 * i);
             i++;
@@ -50,8 +50,11 @@ public class RabbitConnectionConsumer
             {
                 _logger.LogError(e, "failed to connect to rabbitmq");
             }
-
-            mustRetry = false;
+            
+            if (Connection is {IsOpen: true})
+            {
+                mustRetry = false;
+            }
         }
     }
 }
