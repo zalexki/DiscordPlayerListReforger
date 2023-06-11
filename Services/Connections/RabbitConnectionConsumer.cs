@@ -36,7 +36,7 @@ public class RabbitConnectionConsumer
         
         var i = 0;
         var mustRetry = true;
-        while (mustRetry && i < 20)
+        while (mustRetry && i > 20)
         {
             Thread.Sleep(300 * i);
             i++;
