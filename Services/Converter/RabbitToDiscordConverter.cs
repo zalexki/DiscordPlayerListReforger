@@ -12,22 +12,15 @@ public static class RabbitToDiscordConverter
     {
         var contentStringBuild = new StringBuilder();
 
-        if (data.PlayerList is null)
+        data.PlayerList?.ForEach(x =>
         {
-            contentStringBuild.Append("no players");
-        }
-        else
-        {
-            data.PlayerList.ForEach(x =>
-            {
-                var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
-                var factionEmoji = ResolveFactionKey(x.Faction);
-                contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {x.Name}");
-                contentStringBuild.AppendLine();
-            });
-        }
+            var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
+            var factionEmoji = ResolveFactionKey(x.Faction);
+            contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {x.Name}");
+            contentStringBuild.AppendLine();
+        });
         
-        if (data.PlayerList is null)
+        if (false == data.PlayerList?.Any())
         {
             contentStringBuild.Append("no players");
         }
