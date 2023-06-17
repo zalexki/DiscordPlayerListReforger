@@ -73,8 +73,8 @@ public class DiscordHelper
                 
                 return false;
             }
-
-            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.PlayerList ? data.PlayerList.Count() : "0"}∕{data.ServerInfo?.MaxPlayerCount}〕";
+            var playerCount = data.PlayerList ? data.PlayerList.Count() : "0";
+            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
             while (_client.CurrentUser is null)
@@ -90,7 +90,7 @@ public class DiscordHelper
             var embed = new EmbedBuilder();
 
             embed
-                .WithTitle($"-- {data.DiscordMessageTitle} -- [{data.ServerInfo.PlayerCount}/{data.ServerInfo.MaxPlayerCount}]")
+                .WithTitle($"-- {data.DiscordMessageTitle} -- [{playerCount}/{data.ServerInfo.MaxPlayerCount}]")
                 
                 // empty line
                 .AddField("** **", "** **")
