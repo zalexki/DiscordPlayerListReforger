@@ -38,11 +38,11 @@ public class ServerInfo
     public required string MissionName { get; init; }
     
     [Required]
-    [JsonProperty("m_timeInGame")]
+    [JsonProperty("m_upTime")]
     public required float UpTime { get; init; }
 
     [Required]
-    [JsonProperty("timeInGame")]
+    [JsonProperty("m_timeInGame")]
     public required string TimeInGame { get; init; }
     
     [Required]
