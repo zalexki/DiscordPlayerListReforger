@@ -19,11 +19,11 @@ public class ServerGameData
     public required string DiscordMessageTitle { get; init; }
     
     [Required]
-    [JsonProperty("serverInfos")]
+    [JsonProperty("m_serverInfos")]
     public required ServerInfo ServerInfo { get; init; }
     
     [Required]
-    [JsonProperty("playerList")]
+    [JsonProperty("m_players")]
     public required List<PlayerInfo>? PlayerList { get; init; }
 }
 
