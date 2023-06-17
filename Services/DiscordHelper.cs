@@ -73,7 +73,7 @@ public class DiscordHelper
                 
                 return false;
             }
-            var playerCount = data.PlayerList ? data.PlayerList.Count() : "0";
+            var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
