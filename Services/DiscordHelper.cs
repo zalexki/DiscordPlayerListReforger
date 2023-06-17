@@ -74,7 +74,7 @@ public class DiscordHelper
                 return false;
             }
 
-            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
+            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.PlayerList ? data.PlayerList.Count() : "0"}∕{data.ServerInfo?.MaxPlayerCount}〕";
             Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
             while (_client.CurrentUser is null)
