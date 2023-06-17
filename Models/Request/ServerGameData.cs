@@ -81,35 +81,35 @@ public class PlayerInfo
     public required string m_walkedDistance { get; init; }
     
     [JsonProperty("m_drivenDistance")]
-    public string m_drivenDistance { get; init; }
+    public required string m_drivenDistance { get; init; }
     
     [JsonProperty("m_kills")]
-    public string m_kills { get; init; }
+    public required string m_kills { get; init; }
     
     [JsonProperty("m_aiKills")]
-    public string m_aiKills { get; init; }
+    public required string m_aiKills { get; init; }
     
     [JsonProperty("m_deaths")]
-    public string m_deaths { get; init; }
+    public required string m_deaths { get; init; }
     
     [JsonProperty("m_bandageSelf")]
-    public string m_bandageSelf { get; init; }
+    public required string m_bandageSelf { get; init; }
     
     [JsonProperty("m_bulletShots")]
-    public string m_bulletShots { get; init; }
+    public required string m_bulletShots { get; init; }
     
     [JsonProperty("m_grenadesThrown")]
-    public string m_grenadesThrown { get; init; }
+    public required string m_grenadesThrown { get; init; }
     
     [JsonProperty("m_warCrimes")]
-    public string m_warCrimes { get; init; }
+    public required string m_warCrimes { get; init; }
     
     [JsonProperty("m_friendlyPlayerKills")]
-    public string m_friendlyPlayerKills { get; init; }
+    public required string m_friendlyPlayerKills { get; init; }
     
     [JsonProperty("m_friendlyAiKills")]
-    public string m_friendlyAiKills { get; init; }
+    public required string m_friendlyAiKills { get; init; }
     
     [JsonProperty("m_sessionDuration")]
-    public string m_sessionDuration { get; init; }
+    public required string m_sessionDuration { get; init; }
 }
