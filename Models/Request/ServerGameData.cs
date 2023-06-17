@@ -112,10 +112,4 @@ public class PlayerInfo
     
     [JsonProperty("m_sessionDuration")]
     public string m_sessionDuration { get; init; }
-    
-    [JsonProperty("m_faction")]
-    public string Faction { get; init; }
-    
-    [JsonProperty("m_faction")]
-    public string Faction { get; init; }
 }
