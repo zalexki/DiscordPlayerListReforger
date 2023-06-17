@@ -7,15 +7,15 @@ namespace DiscordPlayerList.Models.Request;
 public class ServerGameData
 {
     [Required]
-    [JsonProperty("discordChannelId")]
+    [JsonProperty("m_discordChannelId")]
     public required ulong DiscordChannelId { get; init; }
     
     [Required]
-    [JsonProperty("discordChannelName")]
+    [JsonProperty("m_discordChannelName")]
     public required string DiscordChannelName { get; init; }
     
     [Required]
-    [JsonProperty("discordMessageTitle")]
+    [JsonProperty("m_discordMessageTitle")]
     public required string DiscordMessageTitle { get; init; }
     
     [Required]
@@ -30,15 +30,15 @@ public class ServerGameData
 public class ServerInfo
 {
     [Required]
-    [JsonProperty("serverIp")]
+    [JsonProperty("m_serverIP")]
     public required string ServerIp { get; init; }
     
     [Required]
-    [JsonProperty("missionName")]
+    [JsonProperty("m_missionName")]
     public required string MissionName { get; init; }
     
     [Required]
-    [JsonProperty("upTime")]
+    [JsonProperty("m_timeInGame")]
     public required float UpTime { get; init; }
 
     [Required]
@@ -46,23 +46,23 @@ public class ServerInfo
     public required string TimeInGame { get; init; }
     
     [Required]
-    [JsonProperty("playerCount")]
+    [JsonProperty("m_playerCount")]
     public required int PlayerCount { get; init; }
     
     [Required]
-    [JsonProperty("maxPlayerCount")]
+    [JsonProperty("m_maxPlayerCount")]
     public required int MaxPlayerCount { get; init; }
     
     [Required]
-    [JsonProperty("windSpeed")]
+    [JsonProperty("m_windSpeed")]
     public required float WindSpeed { get; init; }
     
     [Required]
-    [JsonProperty("windDirection")]
+    [JsonProperty("m_windDirection")]
     public required float WindDirection { get; init; }
     
     [Required]
-    [JsonProperty("rainIntensity")]
+    [JsonProperty("m_rainIntensity")]
     public required float RainIntensity { get; init; }
 }
 
