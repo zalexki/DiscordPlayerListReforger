@@ -26,6 +26,11 @@ public static class RabbitToDiscordConverter
                 contentStringBuild.AppendLine();
             });
         }
+        
+        if (data.PlayerList is null)
+        {
+            contentStringBuild.Append("no players");
+        }
 
         return contentStringBuild.ToString();
     }
