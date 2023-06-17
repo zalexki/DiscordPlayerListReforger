@@ -69,14 +69,53 @@ public class ServerInfo
 public class PlayerInfo
 {
     [Required]
-    [JsonProperty("name")]
+    [JsonProperty("m_name")]
     public required string Name { get; init; }
     
     [Required]
-    [JsonProperty("platform")]
+    [JsonProperty("m_platform")]
     public required string Platform { get; init; }
     
     [Required]
-    [JsonProperty("faction")]
-    public required string Faction { get; init; }
+    [JsonProperty("m_walkedDistance")]
+    public required string m_walkedDistance { get; init; }
+    
+    [JsonProperty("m_drivenDistance")]
+    public string m_drivenDistance { get; init; }
+    
+    [JsonProperty("m_kills")]
+    public string m_kills { get; init; }
+    
+    [JsonProperty("m_aiKills")]
+    public string m_aiKills { get; init; }
+    
+    [JsonProperty("m_deaths")]
+    public string m_deaths { get; init; }
+    
+    [JsonProperty("m_bandageSelf")]
+    public string m_bandageSelf { get; init; }
+    
+    [JsonProperty("m_bulletShots")]
+    public string m_bulletShots { get; init; }
+    
+    [JsonProperty("m_grenadesThrown")]
+    public string m_grenadesThrown { get; init; }
+    
+    [JsonProperty("m_warCrimes")]
+    public string m_warCrimes { get; init; }
+    
+    [JsonProperty("m_friendlyPlayerKills")]
+    public string m_friendlyPlayerKills { get; init; }
+    
+    [JsonProperty("m_friendlyAiKills")]
+    public string m_friendlyAiKills { get; init; }
+    
+    [JsonProperty("m_sessionDuration")]
+    public string m_sessionDuration { get; init; }
+    
+    [JsonProperty("m_faction")]
+    public string Faction { get; init; }
+    
+    [JsonProperty("m_faction")]
+    public string Faction { get; init; }
 }
