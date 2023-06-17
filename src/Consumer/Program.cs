@@ -31,5 +31,5 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-// host.UseEnvironment();
+host.UseEnvironment();
 host.Run();
