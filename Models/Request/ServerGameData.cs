@@ -77,6 +77,10 @@ public class PlayerInfo
     public required string Platform { get; init; }
     
     [Required]
+    [JsonProperty("m_faction")]
+    public required string Faction { get; init; }
+    
+    [Required]
     [JsonProperty("m_walkedDistance")]
     public required string m_walkedDistance { get; init; }
     
