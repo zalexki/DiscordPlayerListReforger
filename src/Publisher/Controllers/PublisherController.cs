@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Text;
-using DiscordPlayerListPublisher.Services;
 using DiscordPlayerListShared.Models.Request;
+using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,9 +13,9 @@ namespace DiscordPlayerListPublisher.Controllers;
 public class PublisherController : ControllerBase
 {
     private readonly ILogger<PublisherController> _logger;
-    private readonly RabbitConnectionPublisher _rabbit;
+    private readonly RabbitConnection _rabbit;
 
-    public PublisherController(ILogger<PublisherController> logger, RabbitConnectionPublisher rabbit)
+    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit)
     {
         _logger = logger;
         _rabbit = rabbit;
@@ -41,12 +41,6 @@ public class PublisherController : ControllerBase
         {
             return BadRequest();
         }
-
-        _rabbit.Channel.QueueDeclare(queue: ServerGameData.QueueName,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null);
 
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: ServerGameData.QueueName,

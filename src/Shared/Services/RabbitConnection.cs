@@ -7,6 +7,7 @@ namespace DiscordPlayerListShared.Services;
 
 public class RabbitConnection
 {
+    public IModel Channel;
     public IConnection Connection;
     private readonly ILogger<RabbitConnection> _logger;
 
@@ -15,6 +16,7 @@ public class RabbitConnection
         _logger = logger;
 
         TryConnectionWithRetries();
+        Channel = Connection.CreateModel();
     }
 
     private void TryConnectionWithRetries()

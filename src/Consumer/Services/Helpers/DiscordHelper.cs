@@ -44,7 +44,10 @@ public class DiscordHelper
             var first = botMessages.First();
 
             var embed = new EmbedBuilder();
-            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline");
+            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline")
+                .WithFooter(footer => footer.Text = "🙃")
+                .WithColor(Color.DarkTeal)
+                .WithCurrentTimestamp();
 
             await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
             _logger.LogInformation("finished to send server off discord msg");
@@ -72,15 +75,9 @@ public class DiscordHelper
                 
                 return false;
             }
-<<<<<<< HEAD
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
-=======
-
-            var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{data.ServerInfo.PlayerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             await chanText.ModifyAsync(props => { props.Name = channelName; });
->>>>>>> cc84104 (fix split workers, dockers and update some datas form mod update)
 
             while (_client.CurrentUser is null)
             {
@@ -115,11 +112,11 @@ public class DiscordHelper
                 // empty line
                 .AddField("** **", "** **")
 
-                .WithFooter(footer => footer.Text = "☺")
+                .WithFooter(footer => footer.Text = "🙂")
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {
