@@ -2,9 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DiscordPlayerListConsumer.Services.Helpers;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordPlayerList.Services.BackgroundService;
+namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
 public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundService
 {

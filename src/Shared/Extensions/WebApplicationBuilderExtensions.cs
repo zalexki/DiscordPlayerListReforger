@@ -1,11 +1,13 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 
-namespace DiscordPlayerList.Extensions;
+namespace DiscordPlayerListShared.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
+
     public static WebApplicationBuilder UseEnvironment(this WebApplicationBuilder builder)
     {       
         var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");

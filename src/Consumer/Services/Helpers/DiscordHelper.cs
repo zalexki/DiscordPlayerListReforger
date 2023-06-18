@@ -3,12 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordPlayerList.Models;
-using DiscordPlayerList.Models.Request;
-using DiscordPlayerList.Services.Converter;
+using DiscordPlayerListShared.Models.Request;
+using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordPlayerList.Services;
+namespace DiscordPlayerListConsumer.Services.Helpers;
 
 public class DiscordHelper
 {
@@ -36,18 +35,21 @@ public class DiscordHelper
                 return false;
             }
 
-            var channelName = $"🔴{data.ChannelName.Trim()}〔0∕0〕"; 
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName;}));
+            var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕"; 
+            await chanText.ModifyAsync(props => { props.Name = channelName;});
 
-            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var userBotId = _client.CurrentUser.Id;
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             var first = botMessages.First();
 
             var embed = new EmbedBuilder();
-            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline");
+            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline")
+                .WithFooter(footer => footer.Text = "🙃")
+                .WithColor(Color.DarkTeal)
+                .WithCurrentTimestamp();
 
-            Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+            await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
             _logger.LogInformation("finished to send server off discord msg");
         }
         catch (Exception e)
@@ -75,7 +77,7 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
+            await chanText.ModifyAsync(props => { props.Name = channelName; });
 
             while (_client.CurrentUser is null)
             {
@@ -110,11 +112,11 @@ public class DiscordHelper
                 // empty line
                 .AddField("** **", "** **")
 
-                .WithFooter(footer => footer.Text = "☺")
+                .WithFooter(footer => footer.Text = "🙂")
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             if (botMessages.Any())
             {

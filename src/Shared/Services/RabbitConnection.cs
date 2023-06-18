@@ -3,19 +3,20 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
-namespace DiscordPlayerList.Services.Connections;
+namespace DiscordPlayerListShared.Services;
 
-public class RabbitConnectionPublisher
+public class RabbitConnection
 {
-    public IConnection Connection;
     public IModel Channel;
-    private readonly ILogger<RabbitConnectionPublisher> _logger;
+    public IConnection Connection;
+    private readonly ILogger<RabbitConnection> _logger;
 
-    public RabbitConnectionPublisher(ILogger<RabbitConnectionPublisher> logger)
+    public RabbitConnection(ILogger<RabbitConnection> logger)
     {
         _logger = logger;
 
         TryConnectionWithRetries();
+        Channel = Connection.CreateModel();
     }
 
     private void TryConnectionWithRetries()
@@ -31,6 +32,7 @@ public class RabbitConnectionPublisher
             UserName = username,
             Password = password,
             Port = port,
+            DispatchConsumersAsync = true,
             AutomaticRecoveryEnabled = true
         };
         
@@ -43,24 +45,18 @@ public class RabbitConnectionPublisher
 
             try
             {
-                _logger.LogInformation("publisher TryConnectionWithRetries {I}", i);
+                _logger.LogInformation("consumer TryConnectionWithRetries {I}", i);
                 Connection = factory.CreateConnection();
-                Channel = Connection.CreateModel();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "failed to connect to rabbitmq");
             }
-
+            
             if (Connection is {IsOpen: true})
             {
                 mustRetry = false;
             }
-        }
-
-        if (Connection is {IsOpen: false})
-        {
-            throw new Exception("publisher failed to co rabbit");
         }
     }
 }

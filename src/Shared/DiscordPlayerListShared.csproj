@@ -4,23 +4,19 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyName>DiscordPlayerList</AssemblyName>
-    <RootNamespace>DiscordPlayerList</RootNamespace>
-    <PackageId>DiscordPlayerList</PackageId>
+    <AssemblyName>DiscordPlayerListShared</AssemblyName>
+    <RootNamespace>DiscordPlayerListShared</RootNamespace>
+    <PackageId>DiscordPlayerListShared</PackageId>
+    <RepositoryType>git</RepositoryType>
     <Authors>zalexki</Authors>
-    
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
-
+    <IsPackable>true</IsPackable>
+    <OutputType>Library</OutputType>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.10.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 
     <None Remove=".docker-conf" />
 

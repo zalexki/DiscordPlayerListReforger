@@ -1,6 +1,6 @@
 using System;
 
-namespace DiscordPlayerList.Models;
+namespace DiscordPlayerListConsumer.Models;
 
 public class DiscordChannelTracked
 {

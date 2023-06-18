@@ -7,3 +7,37 @@ services:
     ports:
       - "5679:5672"
       - "15679:15672"
+
+  publisher:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: DockerfilePublisher
+    ports:
+      - "5005:5000"
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - RABBIT_USERNAME=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+
+  consumer:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: DockerfileConsumer
+    ports:
+      - "5006:5000"
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - RABBIT_USERNAME=guest
+      - RABBIT_PASSWORD=guest
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672

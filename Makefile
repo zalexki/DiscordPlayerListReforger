@@ -18,4 +18,14 @@ prod-stop:
 # target: bp|build-publisher        - Start dotnet worker and rabbit in docker containers
 bp:build-publisher
 build-publisher:
-	docker compose -f docker-compose.prod.yml up -d --no-deps --build dotnet
+	BUILDKIT_PROGRESS=plain docker compose up -d --no-deps --build publisher
+
+# target: bp|build-consumer        - Start dotnet worker and rabbit in docker containers
+bc:build-consumer
+build-consumer:
+	BUILDKIT_PROGRESS=plain docker compose up -d --no-deps --build consumer
+
+# target: bn|build-nuget        	- Build shared package nuget 
+bn: build-nuget
+build-nuget:
+	dotnet pack src/Shared -c Release

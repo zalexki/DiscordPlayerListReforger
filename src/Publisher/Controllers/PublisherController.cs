@@ -1,23 +1,21 @@
 using System.Linq;
 using System.Text;
-using DiscordPlayerList.Models.Request;
-using DiscordPlayerList.Services;
-using DiscordPlayerList.Services.BackgroundService;
-using DiscordPlayerList.Services.Connections;
+using DiscordPlayerListShared.Models.Request;
+using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DiscordPlayerList.Controllers;
+namespace DiscordPlayerListPublisher.Controllers;
 
 [ApiController]
 [Route("/publish")]
 public class PublisherController : ControllerBase
 {
     private readonly ILogger<PublisherController> _logger;
-    private readonly RabbitConnectionPublisher _rabbit;
+    private readonly RabbitConnection _rabbit;
 
-    public PublisherController(ILogger<PublisherController> logger, RabbitConnectionPublisher rabbit)
+    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit)
     {
         _logger = logger;
         _rabbit = rabbit;
@@ -44,14 +42,8 @@ public class PublisherController : ControllerBase
             return BadRequest();
         }
 
-        _rabbit.Channel.QueueDeclare(queue: RabbitConsumer.QueueName,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null);
-        
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
-            routingKey: RabbitConsumer.QueueName,
+            routingKey: ServerGameData.QueueName,
             basicProperties: null,
             body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);
