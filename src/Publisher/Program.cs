@@ -1,6 +1,6 @@
 using System.Globalization;
-using DiscordPlayerListPublisher.Services;
 using DiscordPlayerListShared.Extensions;
+using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +17,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<RabbitConnectionPublisher>();
+builder.Services.AddSingleton<RabbitConnection>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

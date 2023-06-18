@@ -49,7 +49,7 @@ public class PublisherController : ControllerBase
                     arguments: null);
 
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
-            routingKey: "arma_reforger_discord_player_list",
+            routingKey: ServerGameData.QueueName,
             basicProperties: null,
             body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);

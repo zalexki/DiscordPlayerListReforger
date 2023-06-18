@@ -3,7 +3,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
-namespace DiscordPlayerListConsumer.Services;
+namespace DiscordPlayerListShared.Services;
 
 public class RabbitConnection
 {

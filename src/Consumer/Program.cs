@@ -4,6 +4,7 @@ using DiscordPlayerListConsumer.Services;
 using DiscordPlayerListConsumer.Services.BackgroundServices;
 using DiscordPlayerListConsumer.Services.Helpers;
 using DiscordPlayerListShared.Extensions;
+using DiscordPlayerListShared.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

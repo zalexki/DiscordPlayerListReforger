@@ -84,49 +84,49 @@ public class PlayerInfo
     
     [Required]
     [JsonProperty("m_walkedDistance")]
-    public required string m_walkedDistance { get; init; }
+    public required string WalkedDistance { get; init; }
     
     [Required]
     [JsonProperty("m_drivenDistance")]
-    public required string m_drivenDistance { get; init; }
+    public required string DrivenDistance { get; init; }
     
     [Required]
     [JsonProperty("m_kills")]
-    public required string m_kills { get; init; }
+    public required string Kills { get; init; }
     
     [Required]
     [JsonProperty("m_aiKills")]
-    public required string m_aiKills { get; init; }
+    public required string KillsAi { get; init; }
     
     [Required]
     [JsonProperty("m_deaths")]
-    public required string m_deaths { get; init; }
+    public required string Deaths { get; init; }
     
     [Required]
     [JsonProperty("m_bandageSelf")]
-    public required string m_bandageSelf { get; init; }
+    public required string BandageSelf { get; init; }
     
     [Required]
     [JsonProperty("m_bulletShots")]
-    public required string m_bulletShots { get; init; }
+    public required string BulletShots { get; init; }
     
     [Required]
     [JsonProperty("m_grenadesThrown")]
-    public required string m_grenadesThrown { get; init; }
+    public required string GrenadesThrown { get; init; }
     
     [Required]
     [JsonProperty("m_warCrimes")]
-    public required string m_warCrimes { get; init; }
+    public required string WarCrimes { get; init; }
     
     [Required]
     [JsonProperty("m_friendlyPlayerKills")]
-    public required string m_friendlyPlayerKills { get; init; }
+    public required string FriendlyPlayerKills { get; init; }
     
     [Required]
     [JsonProperty("m_friendlyAiKills")]
-    public required string m_friendlyAiKills { get; init; }
+    public required string FriendlyAiKills { get; init; }
     
     [Required]
     [JsonProperty("m_sessionDuration")]
-    public required string m_sessionDuration { get; init; }
+    public required string SessionDuration { get; init; }
 }
