@@ -9,7 +9,7 @@
     <PackageId>DiscordPlayerListConsumer</PackageId>
     <Authors>zalexki</Authors>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Shared\DiscordPlayerListShared.csproj" />
   </ItemGroup>

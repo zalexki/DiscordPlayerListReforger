@@ -4,9 +4,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace DiscordPlayerListShared.Extensions;
 
-public static class HostBuilderExtensions
+public static class HostingHostBuilderExtensions
 {
-    public static IHostBuilder UseEnvironment(this IHostBuilder builder)
+    public static IHost UseEnvironment(this IHost builder)
     {       
         var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
         if (File.Exists(file))

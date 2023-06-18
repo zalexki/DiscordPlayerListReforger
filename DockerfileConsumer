@@ -4,16 +4,17 @@ WORKDIR /App
 # Copy everything
 COPY . ./
 
-WORKDIR "./src/Consumer"
+RUN rm -rf src/Publisher
 
+WORKDIR /App/src/Consumer
 # Restore as distinct layers
-RUN dotnet restore 
+RUN dotnet restore
 # Build and publish a release
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/runtime:7.0
+FROM mcr.microsoft.com/dotnet/sdk:7.0
 WORKDIR /App
-COPY --from=build-env /App/Consumer/out .
-RUN ls /App/Consumer
+COPY --from=build-env /App/src/Consumer/out .
+
 ENTRYPOINT ["dotnet", "DiscordPlayerListConsumer.dll"]

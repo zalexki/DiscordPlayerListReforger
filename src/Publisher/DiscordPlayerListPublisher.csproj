@@ -11,12 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include=".\Shared\DiscordPlayerListShared.csproj" />
+    <ProjectReference Include="..\Shared\DiscordPlayerListShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />

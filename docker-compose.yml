@@ -11,7 +11,8 @@ services:
   publisher:
     restart: unless-stopped
     build:
-      context: ./src/Publisher
+      context: .
+      dockerfile: DockerfilePublisher
     ports:
       - "5005:5000"
     depends_on:
@@ -27,7 +28,8 @@ services:
   consumer:
     restart: unless-stopped
     build:
-      context: ./src/Consumer
+      context: .
+      dockerfile: DockerfileConsumer
     ports:
       - "5006:5000"
     depends_on:

@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using DiscordPlayerListConsumer.Services;
 using DiscordPlayerListConsumer.Services.BackgroundServices;
 using DiscordPlayerListConsumer.Services.Helpers;
+using DiscordPlayerListShared.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

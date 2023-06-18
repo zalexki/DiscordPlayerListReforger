@@ -7,22 +7,6 @@ namespace DiscordPlayerListShared.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static IHostBuilder UseEnvironment(this IHostBuilder builder)
-    {       
-        var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
-        if (File.Exists(file))
-        {
-            AddEnvironmentVariable(file);
-        }
-        
-        var localEnvFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env.local");
-        if (File.Exists(localEnvFile))
-        {
-            AddEnvironmentVariable(localEnvFile, overrideExisting: true);
-        }
-        
-        return builder;
-    }
 
     public static WebApplicationBuilder UseEnvironment(this WebApplicationBuilder builder)
     {       
