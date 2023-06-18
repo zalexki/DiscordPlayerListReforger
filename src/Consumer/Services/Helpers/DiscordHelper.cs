@@ -38,7 +38,7 @@ public class DiscordHelper
             var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕"; 
             await chanText.ModifyAsync(props => { props.Name = channelName;});
 
-            var messages = await chanText.GetMessagesAsync(1).FlattenAsync();
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var userBotId = _client.CurrentUser.Id;
             var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
             var first = botMessages.First();
