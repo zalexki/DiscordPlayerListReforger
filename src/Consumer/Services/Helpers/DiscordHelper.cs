@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -23,6 +24,7 @@ public class DiscordHelper
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
     {
         await WaitForConnection();
+        _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.ChannelId });
         
         try
         {
@@ -64,7 +66,8 @@ public class DiscordHelper
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
         await WaitForConnection();
-        
+        _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.DiscordChannelId });
+
         try
         {
             var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){ Timeout = 30000});
