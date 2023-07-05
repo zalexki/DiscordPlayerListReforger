@@ -1,5 +1,5 @@
+using System;
 using System.Linq;
-using System.Text;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,24 +24,33 @@ public class PublisherController : ControllerBase
     [HttpGet]
     public IActionResult SendDiscordMsg()
     {
-        _logger.LogInformation("healthcheck ok");
+        _logger.LogInformation("get ok");
         
         return Ok("ok");
     }
-
+    
     [HttpPost]
-    [Consumes("application/x-www-form-urlencoded")]
     public IActionResult PostRabbitMsg()
     {
         var body = HttpContext.Request.Form.FirstOrDefault();
         _logger.LogInformation("received body: {Body}", body.Key);
-    
-        var gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
+
+        ServerGameData gameData;
+        try
+        {
+            gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "failed to deserializeObject");
+            return BadRequest();
+
+        }
         if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
             return BadRequest();
         }
-
+        
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: ServerGameData.QueueName,
             basicProperties: null,

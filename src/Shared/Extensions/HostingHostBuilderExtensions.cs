@@ -6,7 +6,7 @@ namespace DiscordPlayerListShared.Extensions;
 
 public static class HostingHostBuilderExtensions
 {
-    public static IHost UseEnvironment(this IHost builder)
+    public static IHostBuilder UseEnvironmentFromDotEnv(this IHostBuilder builder)
     {       
         var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
         if (File.Exists(file))

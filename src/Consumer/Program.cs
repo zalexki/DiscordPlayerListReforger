@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Discord.WebSocket;
 using DiscordPlayerListConsumer.Services;
@@ -7,13 +8,13 @@ using DiscordPlayerListShared.Extensions;
 using DiscordPlayerListShared.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
-// Serilog.Debugging.SelfLog.Enable(Console.WriteLine);
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 var host = Host.CreateDefaultBuilder(args)
+    .UseEnvironmentFromDotEnv()
     .ConfigureServices(services =>
     {
         services
@@ -22,16 +23,18 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<RabbitConnection>()
 
             .AddScoped<DiscordHelper>()
-            
+
             .AddHostedService<RabbitConsumer>()
             .AddHostedService<DplBackgroundService>();
     })
-    .ConfigureLogging(logging =>
-    {
-        logging.ClearProviders();
-        logging.AddConsole();
-    })
+    .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.NewRelicLogs(
+            licenseKey: Environment.GetEnvironmentVariable("NEW_RELIC_KEY"),
+            endpointUrl: "https://log-api.eu.newrelic.com/log/v1",
+            applicationName: "DPL-Consumer")
+    )
     .Build();
 
-host.UseEnvironment();
 host.Run();
