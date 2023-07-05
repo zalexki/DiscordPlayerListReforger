@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,9 @@ public class PublisherController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult SendDiscordMsg()
+    public IActionResult Healthcheck()
     {
-        _logger.LogInformation("get ok");
+        _logger.LogInformation("healthcheck ok");
         
         return Ok("ok");
     }
