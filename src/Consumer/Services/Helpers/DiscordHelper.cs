@@ -132,6 +132,8 @@ public class DiscordHelper
             swCurrrent.Restart();
 
             var memChan = _listOfChannels.DiscordChannels.First(x => x.ChannelId == data.DiscordChannelId);
+            _logger.LogInformation("memChan value {val}", memChan.FirstMessageId);
+
             if (memChan is not null && memChan.FirstMessageId != 0L) {
                 Task.Run(() => chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build()));
             } else {
@@ -153,6 +155,7 @@ public class DiscordHelper
                 if (botMessages.Any())
                 {
                     var first = botMessages.First();
+                    memChan.FirstMessageId = first.Id;
                     foreach (var message in botMessages.Where(message => first.Id != message.Id))
                     {
                         await chanText.DeleteMessageAsync(message.Id);
