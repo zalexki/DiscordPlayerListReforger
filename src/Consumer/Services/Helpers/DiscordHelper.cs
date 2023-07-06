@@ -132,7 +132,7 @@ public class DiscordHelper
             swCurrrent.Restart();
 
             var memChan = _listOfChannels.DiscordChannels.First(x => x.ChannelId == data.DiscordChannelId);
-            if (memChan is not null) {
+            if (memChan is not null && memChan.FirstMessageId != 0L) {
                 Task.Run(() => chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build()));
             } else {
                 var i = 0;
