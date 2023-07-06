@@ -95,9 +95,6 @@ public class DiscordHelper
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
-            _logger.LogInformation("perfProfile: chanTitle done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
-            swCurrent.Restart();
-            
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo);
