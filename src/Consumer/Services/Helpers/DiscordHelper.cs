@@ -83,7 +83,7 @@ public class DiscordHelper
         
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){ Timeout = 30000});
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000});
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
@@ -93,7 +93,7 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 5000}));
 
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
@@ -168,11 +168,11 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 5000}));
                 }
                 else
                 {
-                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions(){Timeout = 5000}));
                 }
             }
 
