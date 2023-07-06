@@ -16,11 +16,13 @@ public class DiscordHelper
 {
     private readonly ILogger<DiscordHelper> _logger;
     private readonly DiscordSocketClient _client;
-    
-    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client)
+    private readonly MemoryStorage _listOfChannels;
+
+    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels)
     {
         _logger = logger;
         _client = client;
+        _listOfChannels = listOfChannels;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -69,7 +71,7 @@ public class DiscordHelper
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
-        _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.DiscordChannelId });
+        _logger.BeginScope(new Dictionary<string, string>{ ["channelId"] = data.DiscordChannelId.ToString() });
 
         var sw = Stopwatch.StartNew();
         var swCurrrent = Stopwatch.StartNew();
@@ -93,17 +95,7 @@ public class DiscordHelper
 
             _logger.LogInformation("perfProfile: chanText done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
             swCurrrent.Restart();
-            var i = 0;
-            while (_client.CurrentUser is null)
-            {
-                await Task.Delay(100);
-                i++;
-                if (i > 100) {
-                    return false;
-                }
-            }
-            _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-            swCurrrent.Restart();
+            
             var userBotId = _client.CurrentUser.Id;
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
@@ -111,7 +103,6 @@ public class DiscordHelper
             var wind = RabbitToDiscordConverter.GetWindData(data.ServerInfo);
 
             var embed = new EmbedBuilder();
-
             embed
                 .WithTitle($"-- {data.DiscordMessageTitle} -- [{playerCount}/{data.ServerInfo.MaxPlayerCount}]")
                 
@@ -140,28 +131,44 @@ public class DiscordHelper
             _logger.LogInformation("perfProfile: format embed done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
             swCurrrent.Restart();
 
-            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
-            var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
-
-            _logger.LogInformation("perfProfile: retrieve first msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-            swCurrrent.Stop();
-            if (botMessages.Any())
-            {
-                var first = botMessages.First();
-                foreach (var message in botMessages.Where(message => first.Id != message.Id))
+            var memChan = _listOfChannels.DiscordChannels.First(x => x.ChannelId == data.DiscordChannelId);
+            if (memChan is not null) {
+                Task.Run(() => chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build()));
+            } else {
+                var i = 0;
+                while (_client.CurrentUser is null)
                 {
-                    await chanText.DeleteMessageAsync(message.Id);
+                    await Task.Delay(100);
+                    i++;
+                    if (i > 100) {
+                        return false;
+                    }
                 }
-                // await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
-                Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+                _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
+                swCurrrent.Restart();
+                var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
+                var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
+                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
+                swCurrrent.Stop();
+                if (botMessages.Any())
+                {
+                    var first = botMessages.First();
+                    foreach (var message in botMessages.Where(message => first.Id != message.Id))
+                    {
+                        await chanText.DeleteMessageAsync(message.Id);
+                    }
+                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+
+                }
+                else
+                {
+                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+                }
             }
-            else
-            {
-                // await chanText.SendMessageAsync(embed: embed.Build());
-                Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
-            }
+
             _logger.LogInformation("perfProfile: TOTAL channelId {chanId} in {time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
             sw.Stop();
+            swCurrrent.Stop();
         }
         catch (Exception e)
         {
