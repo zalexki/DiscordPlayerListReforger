@@ -8,6 +8,7 @@ using DiscordPlayerListShared.Extensions;
 using DiscordPlayerListShared.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NewRelic.LogEnrichers.Serilog;
 using Serilog;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -30,6 +31,7 @@ var host = Host.CreateDefaultBuilder(args)
     .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
         .Enrich.FromLogContext()
         .WriteTo.Console()
+        .Enrich.WithNewRelicLogsInContext()
         .WriteTo.NewRelicLogs(
             licenseKey: Environment.GetEnvironmentVariable("NEW_RELIC_KEY"),
             endpointUrl: "https://log-api.eu.newrelic.com/log/v1",
