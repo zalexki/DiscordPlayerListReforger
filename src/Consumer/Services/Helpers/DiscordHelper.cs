@@ -135,8 +135,11 @@ public class DiscordHelper
             _logger.LogInformation("memChan value {val}", memChan.FirstMessageId);
 
             if (memChan is not null && memChan.FirstMessageId != 0L) {
-                try {
+                try 
+                {
                     await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build());
+                    _logger.LogInformation("perfProfile: send modify msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
+                    swCurrrent.Restart();
                 }
                 catch (Exception e) 
                 {
@@ -160,7 +163,7 @@ public class DiscordHelper
                 var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
                 _logger.LogInformation("perfProfile: retrieve first msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
                 swCurrrent.Stop();
-                
+
                 if (botMessages.Any())
                 {
                     var first = botMessages.First();
