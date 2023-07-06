@@ -71,14 +71,16 @@ public class DiscordHelper
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
-        _logger.BeginScope(new Dictionary<string, string>{ ["channelId"] = data.DiscordChannelId.ToString() });
+        _logger.BeginScope(new Dictionary<string, string>{ 
+            ["channelId"] = data.DiscordChannelId.ToString(), 
+            ["channelName"] = data.DiscordChannelName
+        });
+        
+        await WaitForConnection();
 
         var sw = Stopwatch.StartNew();
-        var swCurrrent = Stopwatch.StartNew();
-
-        await WaitForConnection();
-        _logger.LogInformation("perfProfile: WaitForConnection done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-        swCurrrent.Restart();
+        var swCurrent = Stopwatch.StartNew();
+        
         try
         {
             var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){ Timeout = 30000});
@@ -91,12 +93,11 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            await chanText.ModifyAsync(props => { props.Name = channelName; });
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }));
 
-            _logger.LogInformation("perfProfile: chanText done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-            swCurrrent.Restart();
+            _logger.LogInformation("perfProfile: chanTitle done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+            swCurrent.Restart();
             
-            var userBotId = _client.CurrentUser.Id;
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo);
@@ -128,26 +129,22 @@ public class DiscordHelper
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            _logger.LogInformation("perfProfile: format embed done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-            swCurrrent.Restart();
-
-            var memChan = _listOfChannels.DiscordChannels.First(x => x.ChannelId == data.DiscordChannelId);
-            _logger.LogInformation("memChan value {val}", memChan.FirstMessageId);
-
+            var memChan = _listOfChannels.DiscordChannels.FirstOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (memChan is not null && memChan.FirstMessageId != 0L) {
                 try 
                 {
-                    swCurrrent.Restart();
+                    swCurrent.Restart();
                     await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build());
-                    _logger.LogInformation("perfProfile: send modify msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-                    swCurrrent.Restart();
+                    _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+                    swCurrent.Restart();
                 }
                 catch (Exception e) 
                 {
-                    _logger.LogError(e, "failed to modify msg for channelId {chanId}", data.DiscordChannelId);
+                    _logger.LogError(e, "failed to modify msg for channelId {ChanId}", data.DiscordChannelId);
                     memChan.FirstMessageId = 0L;
                 }
             } else {
+                // sometimes socket disconnection seems to happen so we need to wait for user info to be back
                 var i = 0;
                 while (_client.CurrentUser is null)
                 {
@@ -157,13 +154,14 @@ public class DiscordHelper
                         return false;
                     }
                 }
-                _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-                swCurrrent.Restart();
-
+                _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+                swCurrent.Restart();
+                
                 var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
-                var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
-                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
-                swCurrrent.Stop();
+                var botMessages = messages.Where(x => x.Author.Id == _client.CurrentUser.Id).ToList();
+                
+                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+                swCurrent.Stop();
 
                 if (botMessages.Any())
                 {
@@ -181,9 +179,9 @@ public class DiscordHelper
                 }
             }
 
-            _logger.LogInformation("perfProfile: TOTAL channelId {chanId} in {time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
+            _logger.LogInformation("perfProfile: TOTAL channelId {ChanId} in {Time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
             sw.Stop();
-            swCurrrent.Stop();
+            swCurrent.Stop();
         }
         catch (Exception e)
         {
