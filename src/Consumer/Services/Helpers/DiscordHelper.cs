@@ -133,13 +133,13 @@ public class DiscordHelper
                 {
                     await chanText.DeleteMessageAsync(message.Id);
                 }
-                await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
-                // Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+                // await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
+                Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
             }
             else
             {
-                await chanText.SendMessageAsync(embed: embed.Build());
-                // Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+                // await chanText.SendMessageAsync(embed: embed.Build());
+                Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
             }
             sw.Stop();
             _logger.LogInformation("finished channelId {chanId} in {time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
