@@ -137,6 +137,7 @@ public class DiscordHelper
             if (memChan is not null && memChan.FirstMessageId != 0L) {
                 try 
                 {
+                    swCurrrent.Restart();
                     await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build());
                     _logger.LogInformation("perfProfile: send modify msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
                     swCurrrent.Restart();
