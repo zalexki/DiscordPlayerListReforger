@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -25,6 +27,7 @@ public class DiscordHelper
     {
         await WaitForConnection();
         _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.ChannelId });
+        var sw = Stopwatch.StartNew();
         
         try
         {
@@ -52,7 +55,8 @@ public class DiscordHelper
                 .WithCurrentTimestamp();
 
             await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
-            _logger.LogInformation("finished to send server off discord msg");
+            sw.Stop();
+            _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
         }
         catch (Exception e)
         {
@@ -67,6 +71,7 @@ public class DiscordHelper
     {
         await WaitForConnection();
         _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.DiscordChannelId });
+        var sw = Stopwatch.StartNew();
 
         try
         {
@@ -128,12 +133,16 @@ public class DiscordHelper
                 {
                     await chanText.DeleteMessageAsync(message.Id);
                 }
-                Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
+                await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
+                // Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
             }
             else
             {
-                Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+                await chanText.SendMessageAsync(embed: embed.Build());
+                // Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
             }
+            sw.Stop();
+            _logger.LogInformation("finished channelId {chanId} in {time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
         }
         catch (Exception e)
         {
