@@ -155,10 +155,12 @@ public class DiscordHelper
                 }
                 _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
                 swCurrrent.Restart();
+
                 var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
                 var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
                 _logger.LogInformation("perfProfile: retrieve first msg done for channelId {chanId} in {time} ms", data.DiscordChannelId, swCurrrent.ElapsedMilliseconds);
                 swCurrrent.Stop();
+                
                 if (botMessages.Any())
                 {
                     var first = botMessages.First();
@@ -167,7 +169,7 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
+                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build()));
                 }
                 else
                 {
