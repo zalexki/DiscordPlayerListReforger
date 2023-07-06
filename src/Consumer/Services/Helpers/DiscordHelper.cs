@@ -135,7 +135,14 @@ public class DiscordHelper
             _logger.LogInformation("memChan value {val}", memChan.FirstMessageId);
 
             if (memChan is not null && memChan.FirstMessageId != 0L) {
-                Task.Run(() => chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build()));
+                try {
+                    await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build());
+                }
+                catch (Exception e) 
+                {
+                    _logger.LogError(e, "failed to modify msg for channelId {chanId}", data.DiscordChannelId);
+                    memChan.FirstMessageId = 0L;
+                }
             } else {
                 var i = 0;
                 while (_client.CurrentUser is null)
@@ -161,7 +168,6 @@ public class DiscordHelper
                         await chanText.DeleteMessageAsync(message.Id);
                     }
                     Task.Run(() => chanText.SendMessageAsync(embed: embed.Build()));
-
                 }
                 else
                 {
