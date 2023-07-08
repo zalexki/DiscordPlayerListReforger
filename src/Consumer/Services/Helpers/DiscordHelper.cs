@@ -140,16 +140,21 @@ public class DiscordHelper
                     memChan.FirstMessageId = 0L;
                 }
             } else {
-                // sometimes socket disconnection seems to happen so we need to wait for user info to be back
-                var i = 0;
-                while (_client.CurrentUser is null)
+                if (_listOfChannels.BotUserId == 0L)
                 {
-                    await Task.Delay(100);
-                    i++;
-                    if (i > 100) {
-                        return false;
+                    var i = 0;
+                    while (_client.CurrentUser is null)
+                    {
+                        await Task.Delay(100);
+                        i++;
+                        if (i > 100) {
+                            return false;
+                        }
                     }
+
+                    _listOfChannels.BotUserId = _client.CurrentUser.Id;
                 }
+                
                 _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Restart();
                 

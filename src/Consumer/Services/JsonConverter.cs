@@ -33,9 +33,8 @@ public class JsonConverter
 
     public T ToObject<T>(string value)
     {
-        using (var reader = new JsonTextReader(new StringReader(value)))
-        {
-            return Serializer.Deserialize<T>(reader);
-        }
+        var reader = new JsonTextReader(new StringReader(value));
+        
+        return Serializer.Deserialize<T>(reader);
     }
 }

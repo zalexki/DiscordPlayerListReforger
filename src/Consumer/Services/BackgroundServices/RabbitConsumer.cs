@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -93,7 +92,6 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         var json = _jsonConverter.FromObject(obj);
         redisDb.StringSet(obj.ChannelId.ToString(), json);
     }
-
     
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
     {

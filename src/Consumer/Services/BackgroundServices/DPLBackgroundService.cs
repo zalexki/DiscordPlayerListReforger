@@ -39,7 +39,7 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation("Timed Hosted Service is stopping.");
+            _logger.LogInformation("Timed Hosted Service is stopping");
         }
     }
     
