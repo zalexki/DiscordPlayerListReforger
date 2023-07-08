@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DiscordPlayerListConsumer.Services.Helpers;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
@@ -12,12 +13,15 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
     private readonly ILogger<DplBackgroundService> _logger;
     private readonly DiscordHelper _discord;
     private readonly MemoryStorage _memoryStorage;
+    private readonly IConnectionMultiplexer _multiplexerRedis;
 
-    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, MemoryStorage memoryStorage)
+    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, 
+        MemoryStorage memoryStorage, IConnectionMultiplexer multiplexerRedis)
     {
         _logger = logger;
         _discord = discord;
         _memoryStorage = memoryStorage;
+        _multiplexerRedis = multiplexerRedis;
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

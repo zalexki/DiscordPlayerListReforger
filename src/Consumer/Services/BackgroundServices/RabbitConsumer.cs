@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using DiscordPlayerListShared.Services;
+using StackExchange.Redis;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
@@ -19,18 +21,27 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     private readonly RabbitConnection _rabbitConnectionConsumer;
     private readonly MemoryStorage _listOfChannels;
     private readonly DiscordHelper _discord;
+    private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly ILogger<RabbitConsumer> _logger;
+    private readonly JsonConverter _jsonConverter;
 
-    public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, RabbitConnection rabbitConnectionConsumer)
+    private const int REDIS_DB = 1;
+
+    public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, 
+        RabbitConnection rabbitConnectionConsumer, IConnectionMultiplexer multiplexerRedis, JsonConverter jsonConverter)
     {
         _logger = logger;
         _discord = discord;
         _listOfChannels = listOfChannels;
         _rabbitConnectionConsumer = rabbitConnectionConsumer;
+        _multiplexerRedis = multiplexerRedis;
+        _jsonConverter = jsonConverter;
     }
     
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        LoadRedisIntoMemory();
+
         try
         {
             for (var i = 0; i < 3; i++)
@@ -47,7 +58,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
                 c.Received += OnReceived;
 
                 channel.BasicConsume(queue: ServerGameData.QueueName, autoAck: true, consumer: c);
-                _logger.LogInformation($"RabbitConsumer {i} started, Queue [{ServerGameData.QueueName}] is waiting for messages.");
+                _logger.LogInformation("RabbitConsumer {I} started, Queue [{ArmaReforgerDiscordPlayerList}] is waiting for messages", i, ServerGameData.QueueName);
             }
         }
         catch (Exception e)
@@ -58,6 +69,32 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         return Task.CompletedTask;
     }
 
+    private void LoadRedisIntoMemory()
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
+        var keys = server.Keys(REDIS_DB).ToList();
+        
+        var results = keys
+            .Select(key => redisDb.StringGet(key))
+            .Select(redisData => (string) redisData)
+            .ToList();
+
+        foreach (var res in results)
+        {
+            var obj = _jsonConverter.ToObject<DiscordChannelTracked>(res);
+            _listOfChannels.DiscordChannels.Add(obj);
+        }
+    }
+
+    private void SaveIntoRedis(DiscordChannelTracked obj)
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var json = _jsonConverter.FromObject(obj);
+        redisDb.StringSet(obj.ChannelId.ToString(), json);
+    }
+
+    
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
     {
         try
@@ -82,14 +119,16 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             }
             else
             {
-                _listOfChannels.DiscordChannels.Add(new DiscordChannelTracked()
+                existingChannel = new DiscordChannelTracked()
                 {
                     IsUp = true,
                     ChannelId = data.DiscordChannelId,
                     ChannelName = data.DiscordChannelName,
                     LastUpdate = DateTime.UtcNow
-                });
+                };
+                _listOfChannels.DiscordChannels.Add(existingChannel);
             }
+            SaveIntoRedis(existingChannel);
 
             var success = await _discord.SendMessageFromGameData(data);
             if (success)

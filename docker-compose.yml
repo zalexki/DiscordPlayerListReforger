@@ -8,6 +8,14 @@ services:
       - "5679:5672"
       - "15679:15672"
 
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass testpass
+    ports:
+        - "6379:6379"
+    volumes:
+        - redis-data-volume:/data
+
   publisher:
     restart: unless-stopped
     build:
@@ -41,3 +49,6 @@ services:
       - RABBIT_PASSWORD=guest
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
+
+volumes:
+    redis-data-volume:

@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NewRelic.LogEnrichers.Serilog;
 using Serilog;
+using StackExchange.Redis;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
@@ -18,10 +19,18 @@ var host = Host.CreateDefaultBuilder(args)
     .UseEnvironmentFromDotEnv()
     .ConfigureServices(services =>
     {
+        var redisHost = Environment.GetEnvironmentVariable("REDIS_HOST") ?? 
+                           throw new Exception("missing REDIS_HOST env");
+        var redisPass = Environment.GetEnvironmentVariable("REDIS_PASS") ?? 
+                        throw new Exception("missing REDIS_PASS env");
+
         services
-            .AddSingleton<MemoryStorage>()
-            .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect($"{redisHost}:6379,name=dpl-consumer,password={redisPass}"))
             .AddSingleton<RabbitConnection>()
+            .AddSingleton<DiscordSocketClient>()
+            
+            .AddSingleton<JsonConverter>()
+            .AddSingleton<MemoryStorage>()
 
             .AddScoped<DiscordHelper>()
 
