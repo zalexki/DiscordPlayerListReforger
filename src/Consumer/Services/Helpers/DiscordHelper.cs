@@ -92,7 +92,7 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 5000}));
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 15000}));
 
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
@@ -126,40 +126,17 @@ public class DiscordHelper
                 .WithCurrentTimestamp();
 
             var memChan = _listOfChannels.DiscordChannels.FirstOrDefault(x => x.ChannelId == data.DiscordChannelId);
-            if (memChan is not null && memChan.FirstMessageId != 0L) {
-                try 
-                {
-                    swCurrent.Restart();
-                    await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build());
-                    _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
-                    swCurrent.Restart();
-                }
-                catch (Exception e) 
-                {
-                    _logger.LogError(e, "failed to modify msg for channelId {ChanId}", data.DiscordChannelId);
-                    memChan.FirstMessageId = 0L;
-                }
+            if (memChan is not null && memChan.FirstMessageId != 0L)
+            {
+                Task.Run(() => SendMsg(chanText, memChan, embed, data));
             } else {
-                if (_listOfChannels.BotUserId == 0L)
-                {
-                    var i = 0;
-                    while (_client.CurrentUser is null)
-                    {
-                        await Task.Delay(100);
-                        i++;
-                        if (i > 100) {
-                            return false;
-                        }
-                    }
-
-                    _listOfChannels.BotUserId = _client.CurrentUser.Id;
-                }
+                await GetBotUserId();
                 
                 _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Restart();
                 
                 var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
-                var botMessages = messages.Where(x => x.Author.Id == _client.CurrentUser.Id).ToList();
+                var botMessages = messages.Where(x => x.Author.Id == _listOfChannels.BotUserId).ToList();
                 
                 _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Stop();
@@ -172,11 +149,11 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 5000}));
+                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 15000}));
                 }
                 else
                 {
-                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions(){Timeout = 5000}));
+                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions(){Timeout = 15000}));
                 }
             }
 
@@ -191,6 +168,41 @@ public class DiscordHelper
         }
 
         return true;
+    }
+
+    private async Task SendMsg(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed, ServerGameData data)
+    {
+        try 
+        {
+            var timer = Stopwatch.StartNew();
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 15000});
+            timer.Stop();
+            _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, timer.ElapsedMilliseconds);
+        }
+        catch (Exception e) 
+        {
+            _logger.LogError(e, "failed to modify msg for channelId {ChanId}", data.DiscordChannelId);
+            memChan.FirstMessageId = 0L;
+        }
+    }
+
+    private async Task GetBotUserId()
+    {
+        if (_listOfChannels.BotUserId == 0L)
+        {
+            var i = 0;
+            while (_client.CurrentUser is null)
+            {
+                await Task.Delay(100);
+                i++;
+                if (i > 100)
+                {
+                    throw new Exception("failed to find bot user ID");
+                }
+            }
+
+            _listOfChannels.BotUserId = _client.CurrentUser.Id;
+        }
     }
     
     private async Task WaitForConnection()
