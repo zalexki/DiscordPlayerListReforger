@@ -25,7 +25,8 @@ var host = Host.CreateDefaultBuilder(args)
                         throw new Exception("missing REDIS_PASS env");
 
         services
-            .AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect($"{redisHost}:6379,name=dpl-consumer,password={redisPass}"))
+            .AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(
+                $"{redisHost}:6379,name=dpl-consumer,password={redisPass},allowAdmin=true"))
             .AddSingleton<RabbitConnection>()
             .AddSingleton<DiscordSocketClient>()
             

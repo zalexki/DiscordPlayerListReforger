@@ -13,15 +13,12 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
     private readonly ILogger<DplBackgroundService> _logger;
     private readonly DiscordHelper _discord;
     private readonly MemoryStorage _memoryStorage;
-    private readonly IConnectionMultiplexer _multiplexerRedis;
 
-    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, 
-        MemoryStorage memoryStorage, IConnectionMultiplexer multiplexerRedis)
+    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, MemoryStorage memoryStorage)
     {
         _logger = logger;
         _discord = discord;
         _memoryStorage = memoryStorage;
-        _multiplexerRedis = multiplexerRedis;
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
