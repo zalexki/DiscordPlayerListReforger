@@ -43,14 +43,14 @@ public class PublisherController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "content type shit ?");
+            var request = HttpContext.Request;
             var query = HttpContext.Request.Query;
-            var body = HttpContext.Request.Body;
 
             using var stream = new StreamReader(HttpContext.Request.Body);
             var bodyStream = stream.ReadToEnd();
 
+            _logger.LogInformation("request data: {Data}",JsonConvert.SerializeObject(request, Formatting.Indented));
             _logger.LogInformation("query data: {Data}",JsonConvert.SerializeObject(query, Formatting.Indented));
-            _logger.LogInformation("body data: {Data}",JsonConvert.SerializeObject(body, Formatting.Indented));
             _logger.LogInformation("body stream data: {Data}",JsonConvert.SerializeObject(bodyStream, Formatting.Indented));
 
             return BadRequest();

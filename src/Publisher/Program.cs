@@ -33,7 +33,7 @@ builder.Host.UseSerilog((hostingContext, services, loggerConfiguration) => logge
 
 
 var app = builder.Build();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
