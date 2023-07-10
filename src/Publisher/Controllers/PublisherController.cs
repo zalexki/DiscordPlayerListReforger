@@ -33,13 +33,25 @@ public class PublisherController : ControllerBase
     [HttpPost]
     public IActionResult PostRabbitMsg()
     {
-        var body = HttpContext.Request.Form.FirstOrDefault();
-        _logger.LogInformation("received body: {Body}", body.Key);
+        string content;
+        try
+        {
+            content = HttpContext.Request.Form.FirstOrDefault().Key;
+            _logger.LogInformation("received body: {Body}", content);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "content type shit ?");
+            var query = HttpContext.Request.Query;
+            _logger.LogInformation("query data: {Data}",JsonConvert.SerializeObject(query, Formatting.Indented));
+
+            return BadRequest();
+        }
 
         ServerGameData gameData;
         try
         {
-            gameData = JsonConvert.DeserializeObject<ServerGameData>(body.Key.Trim());
+            gameData = JsonConvert.DeserializeObject<ServerGameData>(content);
         }
         catch (Exception e)
         {
