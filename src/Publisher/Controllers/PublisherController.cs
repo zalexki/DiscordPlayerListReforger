@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using DiscordPlayerListShared.Models.Request;
@@ -43,7 +44,14 @@ public class PublisherController : ControllerBase
         {
             _logger.LogError(e, "content type shit ?");
             var query = HttpContext.Request.Query;
+            var body = HttpContext.Request.Body;
+
+            using var stream = new StreamReader(HttpContext.Request.Body);
+            var bodyStream = stream.ReadToEnd();
+
             _logger.LogInformation("query data: {Data}",JsonConvert.SerializeObject(query, Formatting.Indented));
+            _logger.LogInformation("body data: {Data}",JsonConvert.SerializeObject(body, Formatting.Indented));
+            _logger.LogInformation("body stream data: {Data}",JsonConvert.SerializeObject(bodyStream, Formatting.Indented));
 
             return BadRequest();
         }
