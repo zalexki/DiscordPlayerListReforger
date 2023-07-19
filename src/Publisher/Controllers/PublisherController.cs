@@ -48,11 +48,11 @@ public class PublisherController : ControllerBase
             var query = HttpContext.Request.Query;
 
             using var stream = new StreamReader(HttpContext.Request.Body);
-            var bodyStream = stream.ReadToEndAsync();
+            var bodyStream = await stream.ReadToEndAsync();
 
-            _logger.LogError("request data: {Data}",JsonConvert.SerializeObject(request, Formatting.Indented));
-            _logger.LogError("query data: {Data}",JsonConvert.SerializeObject(query, Formatting.Indented));
-            _logger.LogError("body stream data: {Data}",JsonConvert.SerializeObject(bodyStream, Formatting.Indented));
+            _logger.LogError("request data: {Data}", JsonConvert.SerializeObject(request, Formatting.Indented));
+            _logger.LogError("query data: {Data}", JsonConvert.SerializeObject(query, Formatting.Indented));
+            _logger.LogError("body stream data: {Data}", JsonConvert.SerializeObject(bodyStream, Formatting.Indented));
 
             return BadRequest();
         }
