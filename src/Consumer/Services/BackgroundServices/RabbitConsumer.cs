@@ -37,6 +37,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         _jsonConverter = jsonConverter;
     }
     
+    
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         LoadRedisIntoMemory();

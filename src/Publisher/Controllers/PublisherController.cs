@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListShared.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ public class PublisherController : ControllerBase
     }
     
     [HttpPost]
-    public IActionResult PostRabbitMsg()
+    public async Task<IActionResult> PostRabbitMsg()
     {
         string content;
         try
@@ -47,7 +48,7 @@ public class PublisherController : ControllerBase
             var query = HttpContext.Request.Query;
 
             using var stream = new StreamReader(HttpContext.Request.Body);
-            var bodyStream = stream.ReadToEnd();
+            var bodyStream = stream.ReadToEndAsync();
 
             _logger.LogError("request data: {Data}",JsonConvert.SerializeObject(request, Formatting.Indented));
             _logger.LogError("query data: {Data}",JsonConvert.SerializeObject(query, Formatting.Indented));
