@@ -92,7 +92,7 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 15000}));
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 25000}));
 
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
@@ -149,11 +149,11 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 15000}));
+                    Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000}));
                 }
                 else
                 {
-                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions(){Timeout = 15000}));
+                    Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions(){Timeout = 25000}));
                 }
             }
 
