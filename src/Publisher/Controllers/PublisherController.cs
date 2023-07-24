@@ -49,7 +49,7 @@ public class PublisherController : ControllerBase
 
             using var stream = new StreamReader(HttpContext.Request.Body);
             var bodyStream = await stream.ReadToEndAsync();
-            var jsonConfig = new JsonSerializerSettings{ ReferenceLoopHandling = ReferenceLoopHandling.Serialize };
+            var jsonConfig = new JsonSerializerSettings{ ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             
             _logger.LogError("request data: {Data}", JsonConvert.SerializeObject(request, Formatting.Indented, jsonConfig));
             _logger.LogError("query data: {Data}", JsonConvert.SerializeObject(query, Formatting.Indented, jsonConfig));
