@@ -45,14 +45,17 @@ public class PublisherController : ControllerBase
         {
             _logger.LogError(e, "content type shit ?");
             var request = HttpContext.Request;
-            var query = HttpContext.Request.Query;
 
             using var stream = new StreamReader(HttpContext.Request.Body);
             var bodyStream = await stream.ReadToEndAsync();
             var jsonConfig = new JsonSerializerSettings{ ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             
-            _logger.LogError("request data: {Data}", JsonConvert.SerializeObject(request, Formatting.Indented, jsonConfig));
-            _logger.LogError("query data: {Data}", JsonConvert.SerializeObject(query, Formatting.Indented, jsonConfig));
+            //_logger.LogError("request data: {Data}", JsonConvert.SerializeObject(request, Formatting.Indented, jsonConfig));
+            _logger.LogError("query data: {Data}", JsonConvert.SerializeObject(request.Query, Formatting.Indented, jsonConfig));
+            _logger.LogError("headers data: {Data}", JsonConvert.SerializeObject(request.Headers, Formatting.Indented, jsonConfig));
+            _logger.LogError("scheme data: {Data}", JsonConvert.SerializeObject(request.Scheme, Formatting.Indented, jsonConfig));
+            _logger.LogError("contentType data: {Data}", JsonConvert.SerializeObject(request.ContentType, Formatting.Indented, jsonConfig));
+            _logger.LogError("protocol data: {Data}", JsonConvert.SerializeObject(request.Protocol, Formatting.Indented, jsonConfig));
             _logger.LogError("body stream data: {Data}", JsonConvert.SerializeObject(bodyStream, Formatting.Indented, jsonConfig));
 
             return BadRequest();
