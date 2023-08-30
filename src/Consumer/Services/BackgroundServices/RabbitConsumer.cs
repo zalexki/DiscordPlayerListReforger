@@ -109,9 +109,14 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
                 return;
             }
             
+            var needUpdateChannelName = true;
             var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (existingChannel is not null)
             {
+                if (existingChannel.ChannelName == data.DiscordChannelName) { 
+                    needUpdateChannelName = false;
+                    _logger.LogInformation("saved channel name update for {ChannelName}", existingChannel.ChannelName);
+                }
                 existingChannel.ChannelName = data.DiscordChannelName;
                 existingChannel.IsUp = true;
                 existingChannel.LastUpdate = DateTime.UtcNow;
@@ -129,7 +134,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             }
             SaveIntoRedis(existingChannel);
 
-            var success = await _discord.SendMessageFromGameData(data);
+            var success = await _discord.SendMessageFromGameData(data, needUpdateChannelName);
             if (success)
             {
                 _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);

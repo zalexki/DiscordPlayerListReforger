@@ -68,7 +68,7 @@ public class DiscordHelper
         return true;
     }
 
-    public async Task<bool> SendMessageFromGameData(ServerGameData data)
+    public async Task<bool> SendMessageFromGameData(ServerGameData data, bool UpdateChannelName)
     {
         _logger.BeginScope(new Dictionary<string, string>{ 
             ["channelId"] = data.DiscordChannelId.ToString(), 
@@ -92,7 +92,9 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 25000}));
+            if (UpdateChannelName) {
+                Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 25000}));
+            }
 
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
