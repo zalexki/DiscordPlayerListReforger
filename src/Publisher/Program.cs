@@ -20,7 +20,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<RabbitConnection>();
-builder.Services.Configure<FormOptions>(x => { x.KeyLengthLimit = -1; });
+builder.Services.Configure<FormOptions>(x => { x.KeyLengthLimit = int.MaxValue; });
 
 // Config logging
 builder.Host.UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
