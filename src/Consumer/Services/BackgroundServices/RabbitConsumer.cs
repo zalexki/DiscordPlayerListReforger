@@ -115,7 +115,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             {
                 if (existingChannel.ChannelName == data.DiscordChannelName) { 
                     needUpdateChannelName = false;
-                    _logger.LogInformation("saved channel name update for {ChannelName}", existingChannel.ChannelName);
+                    _logger.LogInformation("no channel name update for {ChannelName}", existingChannel.ChannelName);
                 }
                 existingChannel.ChannelName = data.DiscordChannelName;
                 existingChannel.IsUp = true;
