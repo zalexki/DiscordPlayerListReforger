@@ -92,9 +92,7 @@ public class DiscordHelper
             }
             var playerCount = data.PlayerList.Count();
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            if (UpdateChannelName) {
-                Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 25000}));
-            }
+            Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions(){Timeout = 25000}));
 
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
