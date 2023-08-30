@@ -41,8 +41,10 @@ public class DiscordHelper
                 return false;
             }
 
-            var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕"; 
+            var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕";
             await chanText.ModifyAsync(props => { props.Name = channelName;});
+            var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.ChannelId);
+            existingChannel.ComputedChannelName = channelName;
 
             var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
             var userBotId = _client.CurrentUser.Id;
