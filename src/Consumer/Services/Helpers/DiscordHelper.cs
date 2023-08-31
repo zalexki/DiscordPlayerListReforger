@@ -116,16 +116,16 @@ public class DiscordHelper
                 .AddField("** **", "** **")
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Active players", players, true)
-                .AddField("Server", server, true)
+                .AddField("Active players", players.Substring(0, 1024), true)
+                .AddField("Server", server.Substring(0, 1024), true)
                 
                 // empty line
                 .AddField("** **", "** **")
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Mission", missionName, true)
-                .AddField("Time", data.ServerInfo.TimeInGame, true)
-                .AddField("Wind", wind, true)
+                .AddField("Mission", missionName.Substring(0, 1024), true)
+                .AddField("Time", data.ServerInfo.TimeInGame.Substring(0, 1024), true)
+                .AddField("Wind", wind.Substring(0, 1024), true)
                 
                 // empty line
                 .AddField("** **", "** **")
