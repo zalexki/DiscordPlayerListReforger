@@ -116,16 +116,16 @@ public class DiscordHelper
                 .AddField("** **", "** **")
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Active players", players, true)
-                .AddField("Server", server, true)
+                .AddField("Active players", HandleMaxLength(players), true)
+                .AddField("Server", HandleMaxLength(server), true)
                 
                 // empty line
                 .AddField("** **", "** **")
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Mission", missionName, true)
-                .AddField("Time", data.ServerInfo.TimeInGame, true)
-                .AddField("Wind", wind, true)
+                .AddField("Mission", HandleMaxLength(missionName), true)
+                .AddField("Time", HandleMaxLength(data.ServerInfo.TimeInGame), true)
+                .AddField("Wind", HandleMaxLength(wind), true)
                 
                 // empty line
                 .AddField("** **", "** **")
@@ -232,5 +232,13 @@ public class DiscordHelper
                 throw new Exception("could not connect to discord api");
             }
         }
+    }
+    private string HandleMaxLength(string message)
+    {
+        if (message.Length > 1024) {
+            return message.Substring(0, 1024);
+        }
+
+        return message;
     }
 }
