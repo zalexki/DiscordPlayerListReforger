@@ -80,7 +80,7 @@ public class PublisherController : ControllerBase
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: ServerGameData.QueueName,
             basicProperties: null,
-            body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gameData)),
+            body: Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(gameData)),
             mandatory: true);
         
         _logger.LogInformation("success sent json to rabbit");
