@@ -76,6 +76,9 @@ public static class RabbitToDiscordConverter
             "USSR" => ":flag_ru:",
             // "RHS_RF_MSV" => "RHS_:flag_ru:", same for us than rus ...
             "FIA" => "<:FIA:1109836486536347800>",
+            "BLUFOR" => "<:BLUFOR:1147157728435900416>",
+            "OPFOR" => "<:OPFOR:1147157820354089062>",
+            "INDFOR" => "<:INDFOR:1147157785344217140>",
             _ => factionKey
         };
     }
