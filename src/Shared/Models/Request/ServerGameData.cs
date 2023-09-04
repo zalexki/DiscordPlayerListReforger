@@ -9,124 +9,96 @@ public class ServerGameData
     public const string QueueName = "arma_reforger_discord_player_list";
     
     [Required]
-    [JsonProperty("m_discordChannelId")]
+    [JsonProperty("discordChannelId")]
     public required ulong DiscordChannelId { get; init; }
     
     [Required]
-    [JsonProperty("m_discordChannelName")]
+    [JsonProperty("discordChannelName")]
     public required string DiscordChannelName { get; init; }
     
     [Required]
-    [JsonProperty("m_discordMessageTitle")]
+    [JsonProperty("discordMessageTitle")]
     public required string DiscordMessageTitle { get; init; }
     
     [Required]
-    [JsonProperty("m_serverInfos")]
+    [JsonProperty("serverInfos")]
     public required ServerInfo ServerInfo { get; init; }
     
     [Required]
-    [JsonProperty("m_players")]
+    [JsonProperty("players")]
     public required List<PlayerInfo> PlayerList { get; init; }
 }
 
 public class ServerInfo
 {
     [Required]
-    [JsonProperty("m_serverIP")]
+    [JsonProperty("serverIP")]
     public required string ServerIp { get; init; }
     
     [Required]
-    [JsonProperty("m_missionName")]
+    [JsonProperty("missionName")]
     public required string MissionName { get; init; }
     
     [Required]
-    [JsonProperty("m_upTime")]
+    [JsonProperty("upTime")]
     public required float UpTime { get; init; }
 
     [Required]
-    [JsonProperty("m_timeInGame")]
+    [JsonProperty("timeInGame")]
     public required string TimeInGame { get; init; }
     
     [Required]
-    [JsonProperty("m_playerCount")]
+    [JsonProperty("playerCount")]
     public required int PlayerCount { get; init; }
     
     [Required]
-    [JsonProperty("m_maxPlayerCount")]
+    [JsonProperty("maxPlayerCount")]
     public required int MaxPlayerCount { get; init; }
     
     [Required]
-    [JsonProperty("m_windSpeed")]
+    [JsonProperty("windSpeed")]
     public required float WindSpeed { get; init; }
     
     [Required]
-    [JsonProperty("m_windDirection")]
+    [JsonProperty("windDirection")]
     public required float WindDirection { get; init; }
     
     [Required]
-    [JsonProperty("m_rainIntensity")]
+    [JsonProperty("rainIntensity")]
     public required float RainIntensity { get; init; }
 }
 
 public class PlayerInfo
 {
     [Required]
-    [JsonProperty("m_name")]
+    [JsonProperty("name")]
     public required string Name { get; init; }
     
     [Required]
-    [JsonProperty("m_platform")]
+    [JsonProperty("platform")]
     public required string Platform { get; init; }
     
     [Required]
-    [JsonProperty("m_faction")]
+    [JsonProperty("faction")]
     public required string Faction { get; init; }
-    
+
     [Required]
-    [JsonProperty("m_walkedDistance")]
-    public required string WalkedDistance { get; init; }
-    
-    [Required]
-    [JsonProperty("m_drivenDistance")]
-    public required string DrivenDistance { get; init; }
-    
-    [Required]
-    [JsonProperty("m_kills")]
+    [JsonProperty("kills")]
     public required string Kills { get; init; }
     
     [Required]
-    [JsonProperty("m_aiKills")]
+    [JsonProperty("aiKills")]
     public required string KillsAi { get; init; }
     
     [Required]
-    [JsonProperty("m_deaths")]
+    [JsonProperty("deaths")]
     public required string Deaths { get; init; }
     
     [Required]
-    [JsonProperty("m_bandageSelf")]
-    public required string BandageSelf { get; init; }
-    
-    [Required]
-    [JsonProperty("m_bulletShots")]
-    public required string BulletShots { get; init; }
-    
-    [Required]
-    [JsonProperty("m_grenadesThrown")]
-    public required string GrenadesThrown { get; init; }
-    
-    [Required]
-    [JsonProperty("m_warCrimes")]
-    public required string WarCrimes { get; init; }
-    
-    [Required]
-    [JsonProperty("m_friendlyPlayerKills")]
+    [JsonProperty("friendlyPlayerKills")]
     public required string FriendlyPlayerKills { get; init; }
     
     [Required]
-    [JsonProperty("m_friendlyAiKills")]
+    [JsonProperty("friendlyAiKills")]
     public required string FriendlyAiKills { get; init; }
-    
-    [Required]
-    [JsonProperty("m_sessionDuration")]
-    public required string SessionDuration { get; init; }
 }
