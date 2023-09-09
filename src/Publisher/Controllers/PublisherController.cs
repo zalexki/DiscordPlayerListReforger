@@ -110,7 +110,7 @@ public class PublisherController : ControllerBase
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
         var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
-        var keys = server.Keys(1).ToList();
+        var keys = server.Keys(NotTextChannelIds.REDIS_DB).ToList();
         
         var results = keys
             .Select(key => redisDb.StringGet(NotTextChannelIds.REDIS_KEY))
