@@ -259,32 +259,18 @@ public class DiscordHelper
 
     private void SaveIntoRedis(NotTextChannelIds obj)
     {
+        _logger.LogInformation("SaveIntoRedis");
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
-        redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(40));
+        redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(10));
+        _logger.LogInformation("SaveIntoRedis done");
     }
 
     private NotTextChannelIds LoadFromRedisNotTextChannelIds()
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
-        var keys = server.Keys(NotTextChannelIds.REDIS_DB).ToList();
-        
-        var results = keys
-            .Select(key => redisDb.StringGet(NotTextChannelIds.REDIS_KEY))
-            .Select(redisData => (string) redisData)
-            .ToList();
+        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
 
-        var obj = new NotTextChannelIds();
-        
-        foreach (var res in results)
-        {
-            if (res is not null)
-            {
-                obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
-            }
-        }
-
-        return obj;
+        return _jsonConverter.ToObject<NotTextChannelIds>(data);
     }
 }

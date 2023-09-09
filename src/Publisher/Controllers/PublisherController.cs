@@ -109,28 +109,21 @@ public class PublisherController : ControllerBase
     private bool IsInNotATextChannelList(ulong id)
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
-        var keys = server.Keys(NotTextChannelIds.REDIS_DB).ToList();
-        
-        var results = keys
-            .Select(key => redisDb.StringGet(NotTextChannelIds.REDIS_KEY))
-            .Select(redisData => (string) redisData)
-            .ToList();
-
-        var obj = new NotTextChannelIds();
-        
-        foreach (var res in results)
+        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+         try
         {
-            if (res is not null) {
-                obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
+            var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);
+
+            if (obj.Ids is not null && obj.Ids.Contains(id))
+            {
+                return true;
             }
+        } 
+        catch (Exception e)
+        {
+            _logger.LogError(e, "failed to deserializeObject IsInNotATextChannelList");
         }
 
-        if (obj.Ids is not null && obj.Ids.Contains(id))
-        {
-            return true;
-        }
-        
         return false;
     }
 }
