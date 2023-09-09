@@ -269,7 +269,11 @@ public class DiscordHelper
     private NotTextChannelIds LoadFromRedisNotTextChannelIds()
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
+        if (data == string.Empty)
+        {
+            return new NotTextChannelIds();
+        }
 
         return _jsonConverter.ToObject<NotTextChannelIds>(data);
     }
