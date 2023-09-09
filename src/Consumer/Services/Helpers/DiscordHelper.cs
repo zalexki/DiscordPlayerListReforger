@@ -24,12 +24,13 @@ public class DiscordHelper
     private readonly DPLJsonConverter _jsonConverter;
 
 
-    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis)
+    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
     {
         _logger = logger;
         _client = client;
         _listOfChannels = listOfChannels;
         _multiplexerRedis = multiplexerRedis;
+        _jsonConverter = jsonConverter;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
