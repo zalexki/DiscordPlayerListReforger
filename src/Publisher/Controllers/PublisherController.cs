@@ -78,10 +78,6 @@ public class PublisherController : ControllerBase
         try
         {
             gameData = JsonConvert.DeserializeObject<ServerGameData>(content);
-
-            if (IsInNotATextChannelList(gameData.DiscordChannelId.ToString())){
-                return BadRequest("not a text channel id");
-            }
         }
         catch (Exception e)
         {
@@ -91,7 +87,12 @@ public class PublisherController : ControllerBase
         
         if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
-            return BadRequest();
+            return BadRequest("missing DiscordChannelId or DiscordChannelName");
+        }
+
+        if (IsInNotATextChannelList(gameData.DiscordChannelId.ToString()))
+        {
+            return BadRequest("DiscordChannelId is not a text channel id");
         }
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
