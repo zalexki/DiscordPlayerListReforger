@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DiscordPlayerListConsumer.Services.Helpers;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
