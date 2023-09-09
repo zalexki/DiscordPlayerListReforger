@@ -121,7 +121,9 @@ public class PublisherController : ControllerBase
         
         foreach (var res in results)
         {
-            obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
+            if (res is not null) {
+                obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
+            }
         }
 
         if (obj.Ids.Contains(id))
