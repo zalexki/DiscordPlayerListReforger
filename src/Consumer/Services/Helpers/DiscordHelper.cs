@@ -8,6 +8,8 @@ using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Serilog;
+using Newtonsoft.Json;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -69,6 +71,10 @@ public class DiscordHelper
         
         return true;
     }
+    private async Task RetyCallback(IRateLimitInfo rateLimitInfo)
+    {
+        _logger.LogWarning("rate limited {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
+    }
 
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
@@ -84,7 +90,7 @@ public class DiscordHelper
         
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000});
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000, RatelimitCallback = RetyCallback});
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
