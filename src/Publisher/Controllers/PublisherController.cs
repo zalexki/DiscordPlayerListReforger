@@ -126,7 +126,7 @@ public class PublisherController : ControllerBase
             }
         }
 
-        if (obj.Ids.Contains(id))
+        if (obj.Ids is not null && obj.Ids.Contains(id))
         {
             return true;
         }
