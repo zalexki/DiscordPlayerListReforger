@@ -102,7 +102,7 @@ public class DiscordHelper
             {
                 _logger.LogError("failed to cast to ITextChannel");
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
-                notTextChannelIds.Ids.Add(data.DiscordChannelId.ToString());
+                notTextChannelIds.Ids.Add(data.DiscordChannelId);
                 SaveIntoRedis(notTextChannelIds);
                 
                 return false;

@@ -3,12 +3,14 @@ version: "3.9"
 services:
   # user guest/guest
   rabbitmq:
+    restart: unless-stopped
     image: rabbitmq:3-management
     ports:
       - "5679:5672"
       - "15679:15672"
 
   redis:
+    restart: unless-stopped
     image: redis:alpine
     command: redis-server --requirepass testpass
     ports:

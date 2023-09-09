@@ -90,7 +90,7 @@ public class PublisherController : ControllerBase
             return BadRequest("missing DiscordChannelId or DiscordChannelName");
         }
 
-        if (IsInNotATextChannelList(gameData.DiscordChannelId.ToString()))
+        if (gameData is not null && IsInNotATextChannelList(gameData.DiscordChannelId))
         {
             return BadRequest("DiscordChannelId is not a text channel id");
         }
@@ -106,7 +106,7 @@ public class PublisherController : ControllerBase
         return Ok();
     }
 
-    private bool IsInNotATextChannelList(string id)
+    private bool IsInNotATextChannelList(ulong id)
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
         var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
