@@ -30,7 +30,7 @@ bp:build-publisher
 build-publisher:
 	BUILDKIT_PROGRESS=plain docker compose up -d --no-deps --build publisher
 
-# target: bp|build-consumer                      - Start dotnet worker and rabbit in docker containers
+# target: bc|build-consumer                      - Start dotnet worker and rabbit in docker containers
 bc:build-consumer
 build-consumer:
 	BUILDKIT_PROGRESS=plain docker compose up -d --no-deps --build consumer

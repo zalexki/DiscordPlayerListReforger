@@ -1,13 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DiscordPlayerListConsumer.Models.Redis;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListShared.Services;
+using DiscordPlayerListShared.Converter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using Newtonsoft.Json;
 
 namespace DiscordPlayerListPublisher.Controllers;
@@ -18,11 +20,15 @@ public class PublisherController : ControllerBase
 {
     private readonly ILogger<PublisherController> _logger;
     private readonly RabbitConnection _rabbit;
+    private readonly IConnectionMultiplexer _multiplexerRedis;
+    private readonly DPLJsonConverter _jsonConverter;
 
-    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit)
+    public PublisherController(ILogger<PublisherController> logger, RabbitConnection rabbit, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
     {
         _logger = logger;
         _rabbit = rabbit;
+        _multiplexerRedis = multiplexerRedis;
+        _jsonConverter = jsonConverter;
     }
 
     [HttpGet]
@@ -72,6 +78,10 @@ public class PublisherController : ControllerBase
         try
         {
             gameData = JsonConvert.DeserializeObject<ServerGameData>(content);
+
+            if (IsInNotATextChannelList(gameData.DiscordChannelId.ToString())){
+                return BadRequest("not a text channel id");
+            }
         }
         catch (Exception e)
         {
@@ -93,5 +103,31 @@ public class PublisherController : ControllerBase
         _logger.LogInformation("success sent json to rabbit");
     
         return Ok();
+    }
+
+    private bool IsInNotATextChannelList(string id)
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
+        var keys = server.Keys(1).ToList();
+        
+        var results = keys
+            .Select(key => redisDb.StringGet(NotTextChannelIds.REDIS_KEY))
+            .Select(redisData => (string) redisData)
+            .ToList();
+
+        var obj = new NotTextChannelIds();
+        
+        foreach (var res in results)
+        {
+            obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
+        }
+
+        if (obj.Ids.Contains(id))
+        {
+            return true;
+        }
+        
+        return false;
     }
 }

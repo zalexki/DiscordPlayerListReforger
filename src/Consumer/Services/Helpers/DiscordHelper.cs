@@ -8,8 +8,10 @@ using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Serilog;
 using Newtonsoft.Json;
+using StackExchange.Redis;
+using DiscordPlayerListConsumer.Models.Redis;
+using DiscordPlayerListShared.Converter;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -18,12 +20,16 @@ public class DiscordHelper
     private readonly ILogger<DiscordHelper> _logger;
     private readonly DiscordSocketClient _client;
     private readonly MemoryStorage _listOfChannels;
+    private readonly IConnectionMultiplexer _multiplexerRedis;
+    private readonly DPLJsonConverter _jsonConverter;
 
-    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels)
+
+    public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis)
     {
         _logger = logger;
         _client = client;
         _listOfChannels = listOfChannels;
+        _multiplexerRedis = multiplexerRedis;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -44,7 +50,7 @@ public class DiscordHelper
             }
 
             var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕";
-            await chanText.ModifyAsync(props => { props.Name = channelName;});
+            await chanText.ModifyAsync(props => { props.Name = channelName; });
             var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.ChannelId);
             existingChannel.ComputedChannelName = channelName;
 
@@ -95,6 +101,9 @@ public class DiscordHelper
             if (chanText is null)
             {
                 _logger.LogError("failed to cast to ITextChannel");
+                var notTextChannelIds = LoadFromRedisNotTextChannelIds();
+                notTextChannelIds.Ids.Add(data.DiscordChannelId.ToString());
+                SaveIntoRedis(notTextChannelIds);
                 
                 return false;
             }
@@ -104,7 +113,7 @@ public class DiscordHelper
             var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
             
             if (existingChannel.ComputedChannelName != channelName) {
-                _ = Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions() { RetryMode = RetryMode.AlwaysRetry }));
+                _ = Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions() { RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback }));
                 _logger.LogInformation("update channel name from {computedChannelName} to {channelName}", existingChannel.ComputedChannelName, channelName);
                 existingChannel.ComputedChannelName = channelName;
             }
@@ -164,11 +173,11 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    _ = Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions() { Timeout = 25000 }));
+                    _ = Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
                 }
                 else
                 {
-                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000 }));
+                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
                 }
             }
 
@@ -190,7 +199,7 @@ public class DiscordHelper
         try 
         {
             var timer = Stopwatch.StartNew();
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RatelimitCallback = RetyCallback});
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, timer.ElapsedMilliseconds);
         }
@@ -246,5 +255,33 @@ public class DiscordHelper
         }
 
         return message;
+    }
+
+    private void SaveIntoRedis(NotTextChannelIds obj)
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        var json = _jsonConverter.FromObject(obj);
+        redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(40));
+    }
+
+    private NotTextChannelIds LoadFromRedisNotTextChannelIds()
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
+        var keys = server.Keys(1).ToList();
+        
+        var results = keys
+            .Select(key => redisDb.StringGet(NotTextChannelIds.REDIS_KEY))
+            .Select(redisData => (string) redisData)
+            .ToList();
+
+        var obj = new NotTextChannelIds();
+        
+        foreach (var res in results)
+        {
+            obj = _jsonConverter.ToObject<NotTextChannelIds>(res);
+        }
+
+        return obj;
     }
 }

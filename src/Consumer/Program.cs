@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using DiscordPlayerListConsumer.Services;
 using DiscordPlayerListConsumer.Services.BackgroundServices;
 using DiscordPlayerListConsumer.Services.Helpers;
+using DiscordPlayerListShared.Converter;
 using DiscordPlayerListShared.Extensions;
 using DiscordPlayerListShared.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +31,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<RabbitConnection>()
             .AddSingleton<DiscordSocketClient>()
             
-            .AddSingleton<JsonConverter>()
+            .AddSingleton<DPLJsonConverter>()
             .AddSingleton<MemoryStorage>()
 
             .AddScoped<DiscordHelper>()

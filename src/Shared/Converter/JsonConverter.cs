@@ -3,9 +3,9 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace DiscordPlayerListConsumer.Services;
+namespace DiscordPlayerListShared.Converter;
 
-public class JsonConverter
+public class DPLJsonConverter
 {
     public Encoding Encoding { get; init; } = Encoding.UTF8;
 

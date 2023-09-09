@@ -12,6 +12,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using DiscordPlayerListShared.Services;
 using StackExchange.Redis;
+using DiscordPlayerListShared.Converter;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
@@ -22,12 +23,12 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     private readonly DiscordHelper _discord;
     private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly ILogger<RabbitConsumer> _logger;
-    private readonly JsonConverter _jsonConverter;
+    private readonly DPLJsonConverter _jsonConverter;
 
     private const int REDIS_DB = 1;
 
     public RabbitConsumer(ILogger<RabbitConsumer> logger, DiscordHelper discord, MemoryStorage listOfChannels, 
-        RabbitConnection rabbitConnectionConsumer, IConnectionMultiplexer multiplexerRedis, JsonConverter jsonConverter)
+        RabbitConnection rabbitConnectionConsumer, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
     {
         _logger = logger;
         _discord = discord;
