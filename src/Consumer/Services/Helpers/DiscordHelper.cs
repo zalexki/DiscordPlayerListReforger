@@ -48,6 +48,10 @@ public class DiscordHelper
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
+                var notTextChannelIds = LoadFromRedisNotTextChannelIds();
+                notTextChannelIds.Ids.Add(data.ChannelId);
+                SaveIntoRedis(notTextChannelIds);
+              
                 _logger.LogError("failed to cast to ITextChannel");
                 
                 return false;
