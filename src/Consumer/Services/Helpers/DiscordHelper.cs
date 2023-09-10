@@ -36,7 +36,10 @@ public class DiscordHelper
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
     {
         await WaitForConnection();
-        _logger.BeginScope(new Dictionary<string, object>{ ["channelId"] = data.ChannelId });
+         _logger.BeginScope(new Dictionary<string, string>{ 
+            ["channelId"] = data.ChannelId.ToString(), 
+            ["channelName"] = data.ChannelName
+        });
         var sw = Stopwatch.StartNew();
         
         try
@@ -82,7 +85,6 @@ public class DiscordHelper
     {
         _logger.LogWarning("rate limited {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
     }
-
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
         _logger.BeginScope(new Dictionary<string, string>{ 
@@ -101,10 +103,10 @@ public class DiscordHelper
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
-                _logger.LogError("failed to cast to ITextChannel");
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
                 notTextChannelIds.Ids.Add(data.DiscordChannelId);
                 SaveIntoRedis(notTextChannelIds);
+                _logger.LogError("failed to cast to ITextChannel {id}", data.DiscordChannelId);
                 
                 return false;
             }
@@ -249,6 +251,7 @@ public class DiscordHelper
             }
         }
     }
+
     private string HandleMaxLength(string message)
     {
         if (message.Length > 1024) {
@@ -273,8 +276,10 @@ public class DiscordHelper
         {
             var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
             var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
-            _logger.LogInformation("LoadFromRedisNotTextChannelIds data {data}", data);
-            return _jsonConverter.ToObject<NotTextChannelIds>(data);
+
+            if (data != string.Empty) {
+                return _jsonConverter.ToObject<NotTextChannelIds>(data);
+            }
         }  
         catch (Exception e) 
         {
