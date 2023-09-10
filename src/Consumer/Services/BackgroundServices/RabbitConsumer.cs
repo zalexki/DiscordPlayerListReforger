@@ -92,7 +92,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
     {
         var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
-        redisDb.StringSet(obj.ChannelId.ToString(), json, TimeSpan.FromDays(4));
+        redisDb.StringSet(obj.ChannelId.ToString(), json, TimeSpan.FromDays(7));
     }
     
     private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)

@@ -270,7 +270,7 @@ public class DiscordHelper
         _logger.LogInformation("SaveIntoRedis");
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
-        redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(10));
+        redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(7));
         _logger.LogInformation("SaveIntoRedis done");
     }
 
