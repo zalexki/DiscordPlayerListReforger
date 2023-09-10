@@ -273,10 +273,8 @@ public class DiscordHelper
         {
             var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
             var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
-            if (data != string.Empty)
-            {
-                return _jsonConverter.ToObject<NotTextChannelIds>(data);
-            }
+            _logger.LogInformation("LoadFromRedisNotTextChannelIds data {data}", data);
+            return _jsonConverter.ToObject<NotTextChannelIds>(data);
         }  
         catch (Exception e) 
         {
