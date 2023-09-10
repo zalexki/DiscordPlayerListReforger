@@ -110,10 +110,21 @@ public class DiscordHelper
             if (chanText is null)
             {
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
-                if (false == notTextChannelIds.Ids.Contains(data.DiscordChannelId)) {
-                    notTextChannelIds.Ids.Add(data.DiscordChannelId);
+                if (notTextChannelIds.Ids is null)
+                {
+                    notTextChannelIds.Ids = new List<ulong>{
+                        data.DiscordChannelId
+                    };
                     SaveIntoRedis(notTextChannelIds);
+                } 
+                else 
+                {
+                    if (false == notTextChannelIds.Ids.Contains(data.DiscordChannelId)) {
+                        notTextChannelIds.Ids.Add(data.DiscordChannelId);
+                        SaveIntoRedis(notTextChannelIds);
+                    }
                 }
+
                 
                 _logger.LogError("failed to cast to ITextChannel {id}", data.DiscordChannelId);
                 
