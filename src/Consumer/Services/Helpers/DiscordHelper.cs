@@ -75,7 +75,7 @@ public class DiscordHelper
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build());
+            await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(),  options: new RequestOptions(){Timeout = 30000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
             sw.Stop();
             _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
         }
@@ -222,7 +222,7 @@ public class DiscordHelper
         try 
         {
             var timer = Stopwatch.StartNew();
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RatelimitCallback = RetyCallback});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, timer.ElapsedMilliseconds);
         }
