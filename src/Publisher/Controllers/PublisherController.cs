@@ -112,7 +112,7 @@ public class PublisherController : ControllerBase
         var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
         if (data == string.Empty)
         {
-            return false;;
+            return false;
         }
 
         var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);

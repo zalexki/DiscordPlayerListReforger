@@ -49,9 +49,11 @@ public class DiscordHelper
             if (chanText is null)
             {
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
-                notTextChannelIds.Ids.Add(data.ChannelId);
-                SaveIntoRedis(notTextChannelIds);
-              
+                if (false == notTextChannelIds.Ids.Contains(data.ChannelId)) {
+                    notTextChannelIds.Ids.Add(data.ChannelId);
+                    SaveIntoRedis(notTextChannelIds);
+                }
+
                 _logger.LogError("failed to cast to ITextChannel");
                 
                 return false;
@@ -103,13 +105,16 @@ public class DiscordHelper
         
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000, RatelimitCallback = RetyCallback});
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
-                notTextChannelIds.Ids.Add(data.DiscordChannelId);
-                SaveIntoRedis(notTextChannelIds);
+                if (false == notTextChannelIds.Ids.Contains(data.DiscordChannelId)) {
+                    notTextChannelIds.Ids.Add(data.DiscordChannelId);
+                    SaveIntoRedis(notTextChannelIds);
+                }
+                
                 _logger.LogError("failed to cast to ITextChannel {id}", data.DiscordChannelId);
                 
                 return false;
@@ -267,11 +272,9 @@ public class DiscordHelper
 
     private void SaveIntoRedis(NotTextChannelIds obj)
     {
-        _logger.LogInformation("SaveIntoRedis");
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
         redisDb.StringSet(NotTextChannelIds.REDIS_KEY, json, TimeSpan.FromDays(7));
-        _logger.LogInformation("SaveIntoRedis done");
     }
 
     private NotTextChannelIds LoadFromRedisNotTextChannelIds()
