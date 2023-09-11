@@ -49,7 +49,7 @@ public class PublisherController : ControllerBase
             content = firstParam.Key;
             if (firstParam.Value != string.Empty)
             {
-                content = content + firstParam.Value;
+                content += firstParam.Value;
             }
             
             _logger.LogInformation("received body: {Body}", content);
@@ -63,7 +63,6 @@ public class PublisherController : ControllerBase
             var bodyStream = await stream.ReadToEndAsync();
             var jsonConfig = new JsonSerializerSettings{ ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             
-            //_logger.LogError("request data: {Data}", JsonConvert.SerializeObject(request, Formatting.Indented, jsonConfig));
             _logger.LogError("query data: {Data}", JsonConvert.SerializeObject(request.Query, Formatting.Indented, jsonConfig));
             _logger.LogError("headers data: {Data}", JsonConvert.SerializeObject(request.Headers, Formatting.Indented, jsonConfig));
             _logger.LogError("scheme data: {Data}", JsonConvert.SerializeObject(request.Scheme, Formatting.Indented, jsonConfig));
