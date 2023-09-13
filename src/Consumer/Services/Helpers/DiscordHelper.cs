@@ -23,6 +23,8 @@ public class DiscordHelper
     private readonly MemoryStorage _listOfChannels;
     private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly DPLJsonConverter _jsonConverter;
+    private int retrySendName;
+    private int retrySendMessage;
 
 
     public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
@@ -170,6 +172,14 @@ public class DiscordHelper
     
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
+        retrySendMessage++;
+        if (retrySendMessage > 3)
+        {
+            _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
+
+            return;
+        }
+        
         if (_listOfChannels.waitBeforeSendChannelMessage > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
@@ -192,7 +202,7 @@ public class DiscordHelper
                 _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Millisecond);
             }
 
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail});
+            await SendMessage(chanText, memChan, embed);
         }
         catch (Exception e) 
         {
@@ -225,6 +235,14 @@ public class DiscordHelper
     
     private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
     {
+        retrySendName++;
+        if (retrySendName > 3)
+        {
+            _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
+
+            return;
+        }
+        
         if (_listOfChannels.waitBeforeSendChannelName > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
@@ -243,9 +261,8 @@ public class DiscordHelper
                 await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
                 _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Millisecond);
             }
-
-            await chanText.ModifyAsync(props => { props.Name = channelName; });
-
+            
+            await SendRateLimitSafeChannelName(chanText, channelName);
         }
         catch (Exception e)
         {
