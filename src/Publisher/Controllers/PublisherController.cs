@@ -89,7 +89,7 @@ public class PublisherController : ControllerBase
             return BadRequest("missing DiscordChannelId or DiscordChannelName");
         }
 
-        if (gameData is not null && IsInNotATextChannelList(gameData.DiscordChannelId))
+        if (IsInNotATextChannelList(gameData.DiscordChannelId))
         {
             return BadRequest("DiscordChannelId is not a text channel id");
         }
@@ -108,18 +108,14 @@ public class PublisherController : ControllerBase
     private bool IsInNotATextChannelList(ulong id)
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
-        if (data == string.Empty)
+        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+        if (data.IsNull)
         {
             return false;
         }
 
         var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);
-        if (obj.Ids is not null && obj.Ids.Contains(id))
-        {
-            return true;
-        }
- 
-        return false;
+        
+        return obj.Ids is not null && obj.Ids.Contains(id);
     }
 }

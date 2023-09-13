@@ -8,6 +8,7 @@ using DiscordPlayerListConsumer.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Discord.Net;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using DiscordPlayerListConsumer.Models.Redis;
@@ -22,8 +23,10 @@ public class DiscordHelper
     private readonly MemoryStorage _listOfChannels;
     private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly DPLJsonConverter _jsonConverter;
-
-
+    private int waitBeforeSendChannelName = 0;
+    private int waitBeforeSendChannelMessage = 0;
+    
+    
     public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
     {
         _logger = logger;
@@ -32,65 +35,7 @@ public class DiscordHelper
         _multiplexerRedis = multiplexerRedis;
         _jsonConverter = jsonConverter;
     }
-
-    public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
-    {
-        await WaitForConnection();
-         _logger.BeginScope(new Dictionary<string, string>{ 
-            ["channelId"] = data.ChannelId.ToString(), 
-            ["channelName"] = data.ChannelName
-        });
-        var sw = Stopwatch.StartNew();
-        
-        try
-        {
-            var channel = await _client.GetChannelAsync(data.ChannelId);
-            var chanText = channel as ITextChannel;
-            if (chanText is null)
-            {
-                var notTextChannelIds = LoadFromRedisNotTextChannelIds();
-                if (false == notTextChannelIds.Ids.Contains(data.ChannelId)) {
-                    notTextChannelIds.Ids.Add(data.ChannelId);
-                    SaveIntoRedis(notTextChannelIds);
-                }
-
-                _logger.LogError("failed to cast to ITextChannel");
-                
-                return false;
-            }
-
-            var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕";
-            await chanText.ModifyAsync(props => { props.Name = channelName; });
-            var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.ChannelId);
-            existingChannel.ComputedChannelName = channelName;
-
-            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
-            var userBotId = _client.CurrentUser.Id;
-            var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
-            var first = botMessages.First();
-
-            var embed = new EmbedBuilder();
-            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline")
-                .WithFooter(footer => footer.Text = "🙃")
-                .WithColor(Color.DarkTeal)
-                .WithCurrentTimestamp();
-
-            await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(),  options: new RequestOptions(){Timeout = 30000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
-            sw.Stop();
-            _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "failed to send server off discord msg");
-            return false;
-        }
-        
-        return true;
-    }
-    private async Task RetyCallback(IRateLimitInfo rateLimitInfo)
-    {
-        _logger.LogWarning("rate limited {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
-    }
+    
     public async Task<bool> SendMessageFromGameData(ServerGameData data)
     {
         _logger.BeginScope(new Dictionary<string, string>{ 
@@ -105,42 +50,48 @@ public class DiscordHelper
         
         try
         {
-            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
+            var channel = await _client.GetChannelAsync(data.DiscordChannelId, options: new RequestOptions(){Timeout = 30000, RatelimitCallback = RetryCallback});
+            if (channel is null)
+            {
+                _logger.LogError("failed to retrieve channel");
+                return false;
+            }
+            
             var chanText = channel as ITextChannel;
             if (chanText is null)
             {
+                // save id into redis to allow publisher to respond bad request 
                 var notTextChannelIds = LoadFromRedisNotTextChannelIds();
                 if (notTextChannelIds.Ids is null)
                 {
-                    notTextChannelIds.Ids = new List<ulong>{
-                        data.DiscordChannelId
-                    };
+                    notTextChannelIds.Ids = new List<ulong>{data.DiscordChannelId};
                     SaveIntoRedis(notTextChannelIds);
                 } 
                 else 
                 {
                     if (false == notTextChannelIds.Ids.Contains(data.DiscordChannelId)) {
-                        notTextChannelIds.Ids.Add(data.DiscordChannelId);
                         SaveIntoRedis(notTextChannelIds);
                     }
                 }
 
-                
-                _logger.LogError("failed to cast to ITextChannel {id}", data.DiscordChannelId);
+                _logger.LogError("failed to cast to ITextChannel {Id}", data.DiscordChannelId);
                 
                 return false;
             }
 
-            var playerCount = data.PlayerList.Count();
+            var playerCount = data.PlayerList.Count;
+            
+            // update channel name
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
-            
-            if (existingChannel.ComputedChannelName != channelName) {
-                _ = Task.Run(() => chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions() { RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback }));
+            if (existingChannel != null && existingChannel.ComputedChannelName != channelName)
+            {
+                SendChannelName(chanText, data, channelName);
                 _logger.LogInformation("update channel name from {computedChannelName} to {channelName}", existingChannel.ComputedChannelName, channelName);
                 existingChannel.ComputedChannelName = channelName;
             }
 
+            // update message
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo);
@@ -175,7 +126,7 @@ public class DiscordHelper
             var memChan = _listOfChannels.DiscordChannels.FirstOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (memChan is not null && memChan.FirstMessageId != 0L)
             {
-                _ = Task.Run(() => SendMsg(chanText, memChan, embed, data));
+                SendMessage(chanText, memChan, embed);
             } else {
                 await GetBotUserId();
                 
@@ -196,11 +147,13 @@ public class DiscordHelper
                     {
                         await chanText.DeleteMessageAsync(message.Id);
                     }
-                    _ = Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
+
+                    SendMessage(chanText, memChan, embed);
+                    // _ = Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
                 }
                 else
                 {
-                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
+                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RetryMode = RetryMode.AlwaysFail, RatelimitCallback = RetryCallback }));
                 }
             }
 
@@ -216,23 +169,158 @@ public class DiscordHelper
 
         return true;
     }
-
-    private async Task SendMsg(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed, ServerGameData data)
+    
+    private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
+        if (waitBeforeSendChannelMessage > 0)
+        {
+            await Task.Delay(waitBeforeSendChannelMessage);
+        }
+        
         try 
         {
             var timer = Stopwatch.StartNew();
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysRetry, RatelimitCallback = RetyCallback});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail, RatelimitCallback = RetryCallback});
             timer.Stop();
-            _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, timer.ElapsedMilliseconds);
+            _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", memChan.ChannelId, timer.ElapsedMilliseconds);
+        }
+        catch (RateLimitedException e)
+        {
+            _logger.LogWarning("rate limited to modify channel name");
+            if (e.Request.TimeoutAt != null)
+            {
+                waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
+                await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
+            }
+
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RatelimitCallback = RetryCallback});
+            _logger.LogInformation( "retried call for message {Id}", memChan.FirstMessageId);
         }
         catch (Exception e) 
         {
-            _logger.LogError(e, "failed to modify msg for channelId {ChanId}", data.DiscordChannelId);
+            _logger.LogError(e, "failed to modify msg for channelId {ChanId}", memChan.ChannelId);
             memChan.FirstMessageId = 0L;
         }
     }
+    
+    private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
+    {
+        _logger.BeginScope(new Dictionary<string, string>{ 
+            ["channelId"] = data.DiscordChannelId.ToString(), 
+            ["channelName"] = data.DiscordChannelName
+        });
 
+        await SendRateLimitSafeChannelName(chanText, channelName);
+    }
+
+    private async Task SendChannelName(ITextChannel chanText, DiscordChannelTracked data, string channelName)
+    {
+        _logger.BeginScope(new Dictionary<string, string>{ 
+            ["channelId"] = data.ChannelId.ToString(), 
+            ["channelName"] = data.ChannelName
+        });
+
+        await SendRateLimitSafeChannelName(chanText, channelName);
+    }
+    
+    private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
+    {
+        if (waitBeforeSendChannelName > 0)
+        {
+            await Task.Delay(waitBeforeSendChannelName);
+        }
+        
+        try
+        {
+            await chanText.ModifyAsync(props => { props.Name = channelName; });
+        }
+        catch (RateLimitedException e)
+        {
+            _logger.LogWarning("rate limited to modify channel name");
+            if (e.Request.TimeoutAt != null)
+            {
+                waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
+                await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
+            }
+
+            await chanText.ModifyAsync(props => { props.Name = channelName; });
+            _logger.LogInformation( "retried call for chan {Name}", channelName);
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical(e, "failed to modify channel name");
+        }
+    }
+
+    public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
+    {
+        await WaitForConnection();
+         _logger.BeginScope(new Dictionary<string, string>{ 
+            ["channelId"] = data.ChannelId.ToString(), 
+            ["channelName"] = data.ChannelName
+        });
+        var sw = Stopwatch.StartNew();
+        
+        try
+        {
+            var channel = await _client.GetChannelAsync(data.ChannelId);
+            var chanText = channel as ITextChannel;
+            if (chanText is null)
+            {
+                var notTextChannelIds = LoadFromRedisNotTextChannelIds();
+                if (false == notTextChannelIds.Ids.Contains(data.ChannelId)) {
+                    notTextChannelIds.Ids.Add(data.ChannelId);
+                    SaveIntoRedis(notTextChannelIds);
+                }
+
+                _logger.LogError("failed to cast to ITextChannel");
+                
+                return false;
+            }
+
+            var channelName = $"🔴|{data.ChannelName.Trim()}〔0∕0〕";
+            await SendChannelName(chanText, data, channelName);
+            // await chanText.ModifyAsync(props => { props.Name = channelName; });
+            var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.ChannelId);
+            if (existingChannel != null) existingChannel.ComputedChannelName = channelName;
+
+            var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
+            var userBotId = _listOfChannels.BotUserId;
+            if (userBotId == 0L)
+            {
+                await GetBotUserId();
+                userBotId = _listOfChannels.BotUserId;
+            }
+
+            var botMessages = messages.Where(x => x.Author.Id == userBotId).ToList();
+            var first = botMessages.First();
+
+            var embed = new EmbedBuilder();
+            embed.AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "server offline")
+                .WithFooter(footer => footer.Text = "🙃")
+                .WithColor(Color.DarkTeal)
+                .WithCurrentTimestamp();
+
+            SendMessage(chanText, existingChannel, embed);
+            await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(),  options: new RequestOptions(){Timeout = 30000, RatelimitCallback = RetryCallback});
+            sw.Stop();
+            _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "failed to send server off discord msg");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    private async Task RetryCallback(IRateLimitInfo rateLimitInfo)
+    {
+        _logger.LogWarning("rate limited {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
+    }
+    
     private async Task GetBotUserId()
     {
         if (_listOfChannels.BotUserId == 0L)
@@ -304,6 +392,6 @@ public class DiscordHelper
             _logger.LogError(e, "LoadFromRedisNotTextChannelIds error");
         }
 
-        return new NotTextChannelIds();
+        return new NotTextChannelIds(){ Ids = new List<ulong>() };
     }
 }

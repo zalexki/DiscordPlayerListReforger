@@ -70,6 +70,61 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         return Task.CompletedTask;
     }
 
+    private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
+    {
+        try
+        {
+            var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
+            _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
+
+            var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
+            if (data is null)
+            {
+                _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
+
+                return;
+            }
+
+            addOrUpdateChannelInRedis(data);
+
+            var success = await _discord.SendMessageFromGameData(data);
+            if (success)
+            {
+                _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
+            } else {
+                _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical(e, "OnReceived failed");
+        }
+    }
+
+    private void addOrUpdateChannelInRedis(ServerGameData data)
+    {
+        var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
+        if (existingChannel is not null)
+        {
+            existingChannel.ChannelName = data.DiscordChannelName;
+            existingChannel.IsUp = true;
+            existingChannel.LastUpdate = DateTime.UtcNow;
+        }
+        else
+        {
+            existingChannel = new DiscordChannelTracked()
+            {
+                IsUp = true,
+                ChannelId = data.DiscordChannelId,
+                ChannelName = data.DiscordChannelName,
+                ComputedChannelName = data.DiscordChannelName,
+                LastUpdate = DateTime.UtcNow
+            };
+            _listOfChannels.DiscordChannels.Add(existingChannel);
+        }
+        SaveIntoRedis(existingChannel);
+    }
+    
     private void LoadRedisIntoMemory()
     {
         var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
@@ -93,56 +148,5 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
         redisDb.StringSet(obj.ChannelId.ToString(), json, TimeSpan.FromDays(7));
-    }
-    
-    private async Task OnReceived(object model, BasicDeliverEventArgs eventArgs)
-    {
-        try
-        {
-            var rabbitMessage = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-            _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
-
-            var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
-            if (data is null)
-            {
-                _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
-
-                return;
-            }
-            
-
-            var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
-            if (existingChannel is not null)
-            {
-                existingChannel.ChannelName = data.DiscordChannelName;
-                existingChannel.IsUp = true;
-                existingChannel.LastUpdate = DateTime.UtcNow;
-            }
-            else
-            {
-                existingChannel = new DiscordChannelTracked()
-                {
-                    IsUp = true,
-                    ChannelId = data.DiscordChannelId,
-                    ChannelName = data.DiscordChannelName,
-                    ComputedChannelName = data.DiscordChannelName,
-                    LastUpdate = DateTime.UtcNow
-                };
-                _listOfChannels.DiscordChannels.Add(existingChannel);
-            }
-            SaveIntoRedis(existingChannel);
-
-            var success = await _discord.SendMessageFromGameData(data);
-            if (success)
-            {
-                _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
-            } else {
-                _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "OnReceived failed");
-        }
     }
 }
