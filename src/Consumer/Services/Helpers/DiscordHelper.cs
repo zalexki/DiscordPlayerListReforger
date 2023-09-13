@@ -178,13 +178,13 @@ public class DiscordHelper
         try 
         {
             var timer = Stopwatch.StartNew();
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail, RatelimitCallback = RetryCallback});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail});
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", memChan.ChannelId, timer.ElapsedMilliseconds);
         }
         catch (RateLimitedException e)
         {
-            _logger.LogWarning("rate limited to modify channel name");
+            _logger.LogWarning("RateLimitedException to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
@@ -192,7 +192,7 @@ public class DiscordHelper
                 _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Millisecond);
             }
 
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RatelimitCallback = RetryCallback});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail});
         }
         catch (Exception e) 
         {
@@ -232,11 +232,11 @@ public class DiscordHelper
         
         try
         {
-            await chanText.ModifyAsync(props => { props.Name = channelName; });
+            await chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions{RetryMode = RetryMode.AlwaysFail});
         }
         catch (RateLimitedException e)
         {
-            _logger.LogWarning("rate limited to modify channel name");
+            _logger.LogWarning("RateLimitedException to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
                 _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
