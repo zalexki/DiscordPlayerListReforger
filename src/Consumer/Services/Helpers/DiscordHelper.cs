@@ -189,10 +189,10 @@ public class DiscordHelper
             {
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
                 await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
+                _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Millisecond);
             }
 
             await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RatelimitCallback = RetryCallback});
-            _logger.LogInformation( "retried call for message {Id}", memChan.FirstMessageId);
         }
         catch (Exception e) 
         {
@@ -241,10 +241,10 @@ public class DiscordHelper
             {
                 _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
                 await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
+                _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Millisecond);
             }
 
             await chanText.ModifyAsync(props => { props.Name = channelName; });
-            _logger.LogInformation( "retried call for chan {Name}", channelName);
 
         }
         catch (Exception e)
