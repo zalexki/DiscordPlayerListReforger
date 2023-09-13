@@ -23,10 +23,8 @@ public class DiscordHelper
     private readonly MemoryStorage _listOfChannels;
     private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly DPLJsonConverter _jsonConverter;
-    private int waitBeforeSendChannelName = 0;
-    private int waitBeforeSendChannelMessage = 0;
-    
-    
+
+
     public DiscordHelper(ILogger<DiscordHelper> logger, DiscordSocketClient client, MemoryStorage listOfChannels, IConnectionMultiplexer multiplexerRedis, DPLJsonConverter jsonConverter)
     {
         _logger = logger;
@@ -172,9 +170,9 @@ public class DiscordHelper
     
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
-        if (waitBeforeSendChannelMessage > 0)
+        if (_listOfChannels.waitBeforeSendChannelMessage > 0)
         {
-            await Task.Delay(waitBeforeSendChannelMessage);
+            await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
         }
         
         try 
@@ -189,7 +187,7 @@ public class DiscordHelper
             _logger.LogWarning("rate limited to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
-                waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
+                _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
                 await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
             }
 
@@ -225,9 +223,9 @@ public class DiscordHelper
     
     private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
     {
-        if (waitBeforeSendChannelName > 0)
+        if (_listOfChannels.waitBeforeSendChannelName > 0)
         {
-            await Task.Delay(waitBeforeSendChannelName);
+            await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
         }
         
         try
@@ -239,7 +237,7 @@ public class DiscordHelper
             _logger.LogWarning("rate limited to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
-                waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
+                _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
                 await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
             }
 
