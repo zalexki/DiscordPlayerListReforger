@@ -199,6 +199,8 @@ public class DiscordHelper
             _logger.LogError(e, "failed to modify msg for channelId {ChanId}", memChan.ChannelId);
             memChan.FirstMessageId = 0L;
         }
+
+        _listOfChannels.waitBeforeSendChannelMessage = 0;
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
@@ -249,6 +251,8 @@ public class DiscordHelper
         {
             _logger.LogCritical(e, "failed to modify channel name");
         }
+
+        _listOfChannels.waitBeforeSendChannelName = 0;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
