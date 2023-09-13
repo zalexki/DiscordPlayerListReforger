@@ -87,6 +87,9 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 
             addOrUpdateChannelInRedis(data);
 
+            if (_listOfChannels.waitBeforeSendChannelMessage > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
+            if (_listOfChannels.waitBeforeSendChannelName > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
+            
             var success = await _discord.SendMessageFromGameData(data);
             if (success)
             {
