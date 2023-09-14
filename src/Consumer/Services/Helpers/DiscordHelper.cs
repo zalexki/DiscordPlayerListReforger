@@ -291,9 +291,8 @@ public class DiscordHelper
                 if (false == notTextChannelIds.Ids.Contains(data.ChannelId)) {
                     notTextChannelIds.Ids.Add(data.ChannelId);
                     SaveIntoRedis(notTextChannelIds);
+                    _logger.LogError("added data.ChannelId to obj {obj}", JsonConvert.SerializeObject(notTextChannelIds, Formatting.Indented));
                 }
-
-                _logger.LogError("added data.ChannelId to obj {obj}", JsonConvert.SerializeObject(notTextChannelIds, Formatting.Indented));
                 
                 return false;
             }
@@ -400,10 +399,10 @@ public class DiscordHelper
         try
         {
             var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-            var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY).ToString();
-
-            if (data != string.Empty) {
-                return _jsonConverter.ToObject<NotTextChannelIds>(data);
+            var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+            if (false == data.IsNull)
+            {
+                return _jsonConverter.ToObject<NotTextChannelIds>(data.ToString());
             }
         }  
         catch (Exception e) 
