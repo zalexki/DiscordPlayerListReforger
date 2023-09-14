@@ -173,7 +173,7 @@ public class DiscordHelper
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
         retrySendMessage++;
-        if (retrySendMessage > 3)
+        if (retrySendMessage > 10)
         {
             _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
 
@@ -236,7 +236,7 @@ public class DiscordHelper
     private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
     {
         retrySendName++;
-        if (retrySendName > 3)
+        if (retrySendName > 10)
         {
             _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
 
