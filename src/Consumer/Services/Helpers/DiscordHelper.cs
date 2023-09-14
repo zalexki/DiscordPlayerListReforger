@@ -190,6 +190,10 @@ public class DiscordHelper
 
             if (e.Request.TimeoutAt != null)
             {
+                var offset = DateTime.UtcNow - e.Request.TimeoutAt;
+                _logger.LogInformation("RateLimitedException SendMessage  for chan {Name} newOffset {Offset}", memChan.ChannelName, offset.Value.TotalMilliseconds);
+
+                
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Offset;
                 if (e.Request.TimeoutAt.Value.Offset.TotalMilliseconds != 0)
                 {
@@ -200,7 +204,6 @@ public class DiscordHelper
                 {
                     await Task.Delay(1000);
                     _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, 1000);
-
                 }
             }
             else
@@ -271,6 +274,9 @@ public class DiscordHelper
             _logger.LogWarning("RateLimitedException to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
+                var offset = DateTime.UtcNow - e.Request.TimeoutAt;
+                _logger.LogInformation("RateLimitedException SendMessage  for chan {Name} newOffset {Offset}", channelName, offset.Value.TotalMilliseconds);
+                
                 _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Offset;
                 await Task.Delay(e.Request.TimeoutAt.Value.Offset);
                 _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset);
