@@ -192,6 +192,7 @@ public class DiscordHelper
             await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail});
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", memChan.ChannelId, timer.ElapsedMilliseconds);
+            _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
         }
         catch (RateLimitedException e)
         {
@@ -211,7 +212,7 @@ public class DiscordHelper
             memChan.FirstMessageId = 0L;
         }
 
-        _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
+        
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
