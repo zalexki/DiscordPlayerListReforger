@@ -153,7 +153,7 @@ public class DiscordHelper
                 }
                 else
                 {
-                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RetryMode = RetryMode.AlwaysFail, RatelimitCallback = RetryCallback }));
+                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RetryMode = RetryMode.AlwaysRetry }));
                 }
             }
 
@@ -191,7 +191,7 @@ public class DiscordHelper
         try 
         {
             var timer = Stopwatch.StartNew();
-            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysFail});
+            await chanText.ModifyMessageAsync(memChan.FirstMessageId, func: x => x.Embed = embed.Build(), options: new RequestOptions(){Timeout = 25000, RetryMode = RetryMode.AlwaysRetry});
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms", memChan.ChannelId, timer.ElapsedMilliseconds);
             _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
@@ -252,7 +252,7 @@ public class DiscordHelper
         
         try
         {
-            await chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions{RetryMode = RetryMode.AlwaysFail});
+            await chanText.ModifyAsync(props => { props.Name = channelName; }, options: new RequestOptions{RetryMode = RetryMode.AlwaysRetry});
         }
         catch (RateLimitedException e)
         {
