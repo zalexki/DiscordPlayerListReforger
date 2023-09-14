@@ -172,13 +172,13 @@ public class DiscordHelper
     
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
-        retrySendMessage++;
-        if (retrySendMessage > 10)
-        {
-            _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
-            retrySendMessage = 0;
-            return;
-        }
+        // retrySendMessage++;
+        // if (retrySendMessage > 10)
+        // {
+        //     _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
+        //     retrySendMessage = 0;
+        //     return;
+        // }
         
         if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0)
         {
@@ -186,7 +186,7 @@ public class DiscordHelper
             _logger.LogWarning("waited retrySendMessage for chan {Name} {Time}ms", memChan.ChannelName, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
         }
         
-        _logger.LogWarning("SendMessage retrySendMessage={RetrySendMessage} {Time}ms", retrySendMessage, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
+        _logger.LogWarning("SendMessage retrySendMessage={RetrySendMessage} {Time}ms chan={Chan}", retrySendMessage, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds, memChan.ChannelName);
 
         try 
         {
@@ -237,13 +237,13 @@ public class DiscordHelper
     
     private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
     {
-        retrySendName++;
-        if (retrySendName > 10)
-        {
-            _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
+        // retrySendName++;
+        // if (retrySendName > 10)
+        // {
+        //     _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
 
-            return;
-        }
+        //     return;
+        // }
         
         if (_listOfChannels.waitBeforeSendChannelName.TotalMilliseconds > 0)
         {
