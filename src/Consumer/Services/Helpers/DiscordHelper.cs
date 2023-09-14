@@ -265,6 +265,10 @@ public class DiscordHelper
                 await Task.Delay(e.Request.TimeoutAt.Value.Offset);
                 _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
             }
+            else
+            {
+                await Task.Delay(1000);
+            }
             
             await SendRateLimitSafeChannelName(chanText, channelName);
         }
