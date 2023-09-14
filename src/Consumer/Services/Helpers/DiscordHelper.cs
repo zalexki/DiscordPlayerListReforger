@@ -147,13 +147,14 @@ public class DiscordHelper
     
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
-        // retrySendMessage++;
-        // if (retrySendMessage > 10)
-        // {
-        //     _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
-        //     retrySendMessage = 0;
-        //     return;
-        // }
+        retrySendMessage++;
+        if (retrySendMessage > 10)
+        {
+            _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
+            retrySendMessage = 0;
+            return;
+        }
+        
         _logger.LogWarning("SendMessage waitBeforeSendChannelMessage for chan {Name} {Time}ms", 
             memChan.ChannelName,
             _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
@@ -190,8 +191,17 @@ public class DiscordHelper
             if (e.Request.TimeoutAt != null)
             {
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Offset;
-                await Task.Delay(e.Request.TimeoutAt.Value.Offset);
-                _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
+                if (e.Request.TimeoutAt.Value.Offset.TotalMilliseconds != 0)
+                {
+                    await Task.Delay(e.Request.TimeoutAt.Value.Offset);
+                    _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset);
+                }
+                else
+                {
+                    await Task.Delay(1000);
+                    _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, 1000);
+
+                }
             }
             else
             {
@@ -234,13 +244,13 @@ public class DiscordHelper
     
     private async Task SendRateLimitSafeChannelName(ITextChannel chanText, string channelName)
     {
-        // retrySendName++;
-        // if (retrySendName > 10)
-        // {
-        //     _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
+        retrySendName++;
+        if (retrySendName > 10)
+        {
+            _logger.LogWarning("stop retrySendMessage for chan {Name}", channelName);
 
-        //     return;
-        // }
+            return;
+        }
         
         if (_listOfChannels.waitBeforeSendChannelName.TotalMilliseconds > 0)
         {
@@ -263,7 +273,7 @@ public class DiscordHelper
             {
                 _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Offset;
                 await Task.Delay(e.Request.TimeoutAt.Value.Offset);
-                _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
+                _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset);
             }
             else
             {
@@ -335,11 +345,11 @@ public class DiscordHelper
     }
     private async Task RateLimitedCallbackModifyMessage(IRateLimitInfo rateLimitInfo)
     {
-        _logger.LogWarning("rate limited SendMessage {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
+        _logger.LogWarning("rate limited Message {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
     }
     private async Task RateLimitedCallbackModifyName(IRateLimitInfo rateLimitInfo)
     {
-        _logger.LogWarning("rate limited SendMessage {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
+        _logger.LogWarning("rate limited Name {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
     }
     
     private async Task GetBotUserId()

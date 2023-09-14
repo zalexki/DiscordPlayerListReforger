@@ -169,8 +169,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         }
 
         var obj = _jsonConverter.ToObject<NotTextChannelIds>(data.ToString());
-        _logger.LogInformation("IsInNotATextChannelList obj {RabbitMessage}", JsonConvert.SerializeObject(obj,Formatting.Indented));
-
+        
         return obj.Ids is not null && obj.Ids.Contains(id);
     }
 }
