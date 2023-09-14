@@ -13,6 +13,7 @@ using RabbitMQ.Client.Events;
 using DiscordPlayerListShared.Services;
 using StackExchange.Redis;
 using DiscordPlayerListShared.Converter;
+using DiscordPlayerListConsumer.Models.Redis;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 
@@ -85,10 +86,17 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
                 return;
             }
 
+            if (IsInNotATextChannelList(data.DiscordChannelId))
+            {
+                _logger.LogWarning("skipped not a text channel id : {DiscordChannelId}", data.DiscordChannelId);
+
+                return;
+            }
+
             addOrUpdateChannelInRedis(data);
 
-            if (_listOfChannels.waitBeforeSendChannelMessage > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
-            if (_listOfChannels.waitBeforeSendChannelName > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
+            if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
+            if (_listOfChannels.waitBeforeSendChannelName.TotalMilliseconds > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
             
             var success = await _discord.SendMessageFromGameData(data);
             if (success)
@@ -151,5 +159,19 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
         redisDb.StringSet(obj.ChannelId.ToString(), json, TimeSpan.FromDays(7));
+    }
+
+    private bool IsInNotATextChannelList(ulong id)
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+        if (data.IsNull)
+        {
+            return false;
+        }
+
+        var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);
+        
+        return obj.Ids is not null && obj.Ids.Contains(id);
     }
 }
