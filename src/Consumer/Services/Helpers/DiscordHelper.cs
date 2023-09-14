@@ -185,13 +185,17 @@ public class DiscordHelper
         }
         catch (RateLimitedException e)
         {
-            _logger.LogInformation("RateLimitedException for chan {Name}", memChan.ChannelName);
+            _logger.LogInformation("RateLimitedException SendMessage for chan {Name}", memChan.ChannelName);
 
             if (e.Request.TimeoutAt != null)
             {
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Offset;
                 await Task.Delay(e.Request.TimeoutAt.Value.Offset);
                 _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
+            }
+            else
+            {
+                await Task.Delay(1000);
             }
 
             await SendMessage(chanText, memChan, embed);
