@@ -15,7 +15,7 @@ public class DiscordChannelTracked
     [JsonProperty("channelName")]
     public required string ChannelName { get; set; }
 
-    [JsonProperty("ComputedchannelName")]
+    [JsonProperty("ComputedChannelName")]
     public required string ComputedChannelName { get; set; }
 
     [JsonProperty("firstMessageId")]
@@ -23,6 +23,4 @@ public class DiscordChannelTracked
 
     [JsonProperty("lastUpdate")]
     public required DateTime LastUpdate { get; set; }
-    
-    // public ITextChannel? chanText { get; set; }
 }
