@@ -154,8 +154,7 @@ public class DiscordHelper
             retrySendMessage = 0;
             return;
         }
-        _logger.LogInformation("retrySendMessage = {count} for chan {Name} {Date}", memChan.ChannelName, retrySendMessage, DateTime.UtcNow);
-        
+
         if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
