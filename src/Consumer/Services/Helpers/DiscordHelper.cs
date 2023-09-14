@@ -183,6 +183,7 @@ public class DiscordHelper
         if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
+            _logger.LogWarning("waited retrySendMessage for chan {Name} {Time}ms", memChan.ChannelName, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
         }
         
         try 
@@ -199,7 +200,7 @@ public class DiscordHelper
             {
                 _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Offset;
                 await Task.Delay(e.Request.TimeoutAt.Value.Offset);
-                _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
+                _logger.LogInformation("retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
             }
 
             await SendMessage(chanText, memChan, embed);
