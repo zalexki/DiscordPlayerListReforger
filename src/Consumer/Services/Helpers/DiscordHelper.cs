@@ -126,7 +126,7 @@ public class DiscordHelper
             var memChan = _listOfChannels.DiscordChannels.FirstOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (memChan is not null && memChan.FirstMessageId != 0L)
             {
-                SendMessage(chanText, memChan, embed);
+                await SendMessage(chanText, memChan, embed);
             } else {
                 await GetBotUserId();
                 
@@ -176,7 +176,7 @@ public class DiscordHelper
         if (retrySendMessage > 10)
         {
             _logger.LogWarning("stop retrySendMessage for chan {Name}", memChan.ChannelName);
-
+            retrySendMessage = 0;
             return;
         }
         
@@ -186,6 +186,8 @@ public class DiscordHelper
             _logger.LogWarning("waited retrySendMessage for chan {Name} {Time}ms", memChan.ChannelName, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
         }
         
+        _logger.LogWarning("SendMessage retrySendMessage={RetrySendMessage} {Time}ms", retrySendMessage, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
+
         try 
         {
             var timer = Stopwatch.StartNew();
@@ -211,8 +213,6 @@ public class DiscordHelper
             _logger.LogError(e, "failed to modify msg for channelId {ChanId}", memChan.ChannelId);
             memChan.FirstMessageId = 0L;
         }
-
-        
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
