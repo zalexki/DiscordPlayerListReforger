@@ -24,5 +24,5 @@ public class DiscordChannelTracked
     [JsonProperty("lastUpdate")]
     public required DateTime LastUpdate { get; set; }
     
-    public ITextChannel? chanText { get; set; }
+    // public ITextChannel? chanText { get; set; }
 }

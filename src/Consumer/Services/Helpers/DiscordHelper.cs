@@ -420,10 +420,10 @@ public class DiscordHelper
     {
         var memoryChan = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
 
-        if (memoryChan is {chanText: not null})
-        {
-            return memoryChan.chanText;
-        }
+        // if (memoryChan is {chanText: not null})
+        // {
+        //     return memoryChan.chanText;
+        // }
         
         var channel = await _client.GetChannelAsync(data.DiscordChannelId, 
             options: new RequestOptions()
@@ -460,7 +460,7 @@ public class DiscordHelper
             return null;
         }
            
-        memoryChan.chanText = chanText;
+        // memoryChan.chanText = chanText;
 
         return chanText;
     }
