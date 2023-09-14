@@ -170,7 +170,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             return false;
         }
 
-        var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);
+        var obj = _jsonConverter.ToObject<NotTextChannelIds>(data.ToString());
         
         return obj.Ids is not null && obj.Ids.Contains(id);
     }

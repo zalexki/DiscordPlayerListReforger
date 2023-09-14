@@ -59,7 +59,7 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
                 _logger.LogError(e, "failed to sendServerOff for {@DiscordChannelTracked}", discordChannelTracked);
             }
             
-            await Task.Delay(100);
+            await Task.Delay(200);
         }
     }
 }
