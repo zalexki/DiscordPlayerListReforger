@@ -194,7 +194,7 @@ public class DiscordHelper
             {
                 await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
                 _logger.LogInformation("retried SendMessage for chan {Name} {Id} after {Time}ms", 
-                    memChan.ChannelName, memChan.ChannelId, e.Request.TimeoutAt.Value.Offset);
+                    memChan.ChannelName, memChan.ChannelId, _listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds);
             }
             else
             {
@@ -213,6 +213,8 @@ public class DiscordHelper
         {
             _logger.LogError(e, "failed to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
         }
+
+        _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
