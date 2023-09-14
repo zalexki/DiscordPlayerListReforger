@@ -293,7 +293,7 @@ public class DiscordHelper
                     SaveIntoRedis(notTextChannelIds);
                 }
 
-                _logger.LogError("failed to cast to ITextChannel");
+                _logger.LogError("added data.ChannelId to obj {obj}", JsonConvert.SerializeObject(notTextChannelIds, Formatting.Indented));
                 
                 return false;
             }
