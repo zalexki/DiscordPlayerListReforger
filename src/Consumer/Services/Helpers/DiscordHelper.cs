@@ -216,7 +216,7 @@ public class DiscordHelper
             _logger.LogError(e, "failed to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
         }
 
-        _memoryStorage.waitBeforeSendChannelMessage = TimeSpan.FromMilliseconds(100);
+        _memoryStorage.waitBeforeSendChannelMessage = TimeSpan.FromMilliseconds(1000);
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
