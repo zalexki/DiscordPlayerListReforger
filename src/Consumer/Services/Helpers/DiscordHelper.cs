@@ -322,7 +322,7 @@ public class DiscordHelper
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "failed to send server off discord msg {chan}", data.chanText);
+            _logger.LogError(e, "failed to send server off discord msg {chan}", data.ChannelName);
             return false;
         }
         
