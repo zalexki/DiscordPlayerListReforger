@@ -34,7 +34,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<DPLJsonConverter>()
             .AddSingleton<MemoryStorage>()
 
-            .AddScoped<DiscordHelper>()
+            .AddTransient<DiscordHelper>()
 
             .AddHostedService<RabbitConsumer>()
             .AddHostedService<DplBackgroundService>();
