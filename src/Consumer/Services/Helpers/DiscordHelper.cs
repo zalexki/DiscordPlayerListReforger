@@ -216,7 +216,7 @@ public class DiscordHelper
             _logger.LogError(e, "failed to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
         }
 
-        _memoryStorage.waitBeforeSendChannelMessage = TimeSpan.FromMilliseconds(1000);
+        _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
@@ -263,6 +263,9 @@ public class DiscordHelper
                     RetryMode = RetryMode.AlwaysFail,
                     RatelimitCallback = RateLimitedCallbackModifyName
                 });
+            
+            _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
+            retrySendName = 0;
         }
         catch (RateLimitedException e)
         {
@@ -277,7 +280,7 @@ public class DiscordHelper
             _logger.LogCritical(e, "failed to sendName {Name}", channelName);
         }
 
-        _memoryStorage.waitBeforeSendChannelName = TimeSpan.FromMilliseconds(50);
+        _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
