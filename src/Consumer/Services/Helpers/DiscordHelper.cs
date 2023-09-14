@@ -86,7 +86,7 @@ public class DiscordHelper
             var existingChannel = _listOfChannels.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (existingChannel != null && existingChannel.ComputedChannelName != channelName)
             {
-                SendChannelName(chanText, data, channelName);
+                await SendChannelName(chanText, data, channelName);
                 _logger.LogInformation("update channel name from {computedChannelName} to {channelName}", existingChannel.ComputedChannelName, channelName);
                 existingChannel.ComputedChannelName = channelName;
             }
@@ -148,7 +148,7 @@ public class DiscordHelper
                         await chanText.DeleteMessageAsync(message.Id);
                     }
 
-                    SendMessage(chanText, memChan, embed);
+                    await SendMessage(chanText, memChan, embed);
                     // _ = Task.Run(() => chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(), options: new RequestOptions() { Timeout = 25000, RatelimitCallback = RetyCallback }));
                 }
                 else
@@ -180,7 +180,7 @@ public class DiscordHelper
             return;
         }
         
-        if (_listOfChannels.waitBeforeSendChannelMessage > 0)
+        if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
         }
@@ -197,9 +197,9 @@ public class DiscordHelper
             _logger.LogWarning("RateLimitedException to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
-                _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Millisecond;
-                await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
-                _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Millisecond);
+                _listOfChannels.waitBeforeSendChannelMessage = e.Request.TimeoutAt.Value.Offset;
+                await Task.Delay(e.Request.TimeoutAt.Value.Offset);
+                _logger.LogInformation( "retried call for chan {Id} after {Time}ms", memChan.FirstMessageId, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
             }
 
             await SendMessage(chanText, memChan, embed);
@@ -210,7 +210,7 @@ public class DiscordHelper
             memChan.FirstMessageId = 0L;
         }
 
-        _listOfChannels.waitBeforeSendChannelMessage = 0;
+        _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
@@ -243,7 +243,7 @@ public class DiscordHelper
             return;
         }
         
-        if (_listOfChannels.waitBeforeSendChannelName > 0)
+        if (_listOfChannels.waitBeforeSendChannelName.TotalMilliseconds > 0)
         {
             await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
         }
@@ -257,9 +257,9 @@ public class DiscordHelper
             _logger.LogWarning("RateLimitedException to modify channel name");
             if (e.Request.TimeoutAt != null)
             {
-                _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Millisecond;
-                await Task.Delay(e.Request.TimeoutAt.Value.Millisecond);
-                _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Millisecond);
+                _listOfChannels.waitBeforeSendChannelName = e.Request.TimeoutAt.Value.Offset;
+                await Task.Delay(e.Request.TimeoutAt.Value.Offset);
+                _logger.LogInformation( "retried call for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset.TotalMilliseconds);
             }
             
             await SendRateLimitSafeChannelName(chanText, channelName);
@@ -269,7 +269,7 @@ public class DiscordHelper
             _logger.LogCritical(e, "failed to modify channel name");
         }
 
-        _listOfChannels.waitBeforeSendChannelName = 0;
+        _listOfChannels.waitBeforeSendChannelName = new TimeSpan();
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
@@ -321,7 +321,7 @@ public class DiscordHelper
                 .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp();
 
-            SendMessage(chanText, existingChannel, embed);
+            await SendMessage(chanText, existingChannel, embed);
             await chanText.ModifyMessageAsync(first.Id, func: x => x.Embed = embed.Build(),  options: new RequestOptions(){Timeout = 30000, RatelimitCallback = RetryCallback});
             sw.Stop();
             _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
