@@ -179,6 +179,7 @@ public class DiscordHelper
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms",
                 memChan.ChannelId, timer.ElapsedMilliseconds);
             _listOfChannels.waitBeforeSendChannelMessage = new TimeSpan();
+            retrySendMessage = 0;
         }
         catch (RateLimitedException e)
         {
@@ -204,6 +205,7 @@ public class DiscordHelper
             }
 
             await SendMessage(chanText, memChan, embed);
+            
         }
         catch (TimeoutException e)
         {
