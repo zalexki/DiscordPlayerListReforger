@@ -38,15 +38,14 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
         _multiplexerRedis = multiplexerRedis;
         _jsonConverter = jsonConverter;
     }
-    
-    
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         LoadRedisIntoMemory();
 
         try
         {
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < 1; i++)
             {
                 var channel = _rabbitConnectionConsumer.Connection.CreateModel();
                 channel.QueueDeclare(queue: ServerGameData.QueueName,
@@ -98,12 +97,11 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             if (_listOfChannels.waitBeforeSendChannelMessage.TotalMilliseconds > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelMessage);
             if (_listOfChannels.waitBeforeSendChannelName.TotalMilliseconds > 0) await Task.Delay(_listOfChannels.waitBeforeSendChannelName);
             
-            var success = await _discord.SendMessageFromGameData(data);
-            if (success)
+            if (await _discord.SendMessageFromGameData(data))
             {
-                _logger.LogInformation("RabbitConsumer finished successfully to consume: {RabbitMessage}", rabbitMessage);
+                _logger.LogInformation("RabbitConsumer finished successfully to consume: {Id}", data.DiscordChannelId);
             } else {
-                _logger.LogInformation("RabbitConsumer finished failed to consume: {RabbitMessage}", rabbitMessage);
+                _logger.LogInformation("RabbitConsumer finished failed to consume: {Id}", data.DiscordChannelId);
             }
         }
         catch (Exception e)

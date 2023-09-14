@@ -1,4 +1,5 @@
 using System;
+using Discord;
 using Newtonsoft.Json;
 
 namespace DiscordPlayerListConsumer.Models;
@@ -22,4 +23,6 @@ public class DiscordChannelTracked
 
     [JsonProperty("lastUpdate")]
     public required DateTime LastUpdate { get; set; }
+    
+    public ITextChannel chanText { get; set; }
 }
