@@ -79,8 +79,8 @@ public class DiscordHelper
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players name", players.data, true)
-                .AddField("P | F | K | D ", playerExtra, true)
-                .AddField("FP Kills | FA Kills", playerFriendlyKills, true)
+                .AddField("P | F | K | D ", playerExtra == string.Empty ? playerExtra : ".", true)
+                .AddField("FP Kills | FA Kills", playerFriendlyKills == string.Empty ? playerFriendlyKills : ".", true)
                 .AddField("** **", "** **")
                 .AddField("Server", HandleMaxLength(server), true)
                 
