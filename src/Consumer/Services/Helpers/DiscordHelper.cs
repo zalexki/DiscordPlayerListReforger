@@ -78,9 +78,9 @@ public class DiscordHelper
                 .AddField("** **", "** **")
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
-                .AddField("Active players name", players.data == string.Empty ? players.data : ".", true)
-                .AddField("P | F | K | D ", playerExtra == string.Empty ? playerExtra : ".", true)
-                .AddField("FP Kills | FA Kills", playerFriendlyKills == string.Empty ? playerFriendlyKills : ".", true)
+                .AddField("Active players name", players.data, true)
+                .AddField("P | F | K | D ", playerExtra, true)
+                .AddField("FP Kills | FA Kills", playerFriendlyKills, true)
                 .AddField("** **", "** **")
                 .AddField("Server", HandleMaxLength(server), true)
                 
@@ -89,7 +89,7 @@ public class DiscordHelper
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Mission", HandleMaxLength(missionName), true)
-                .AddField("Time", HandleMaxLength(data.ServerInfo?.TimeInGame), true)
+                .AddField("Time", HandleMaxLength(data.ServerInfo?.TimeInGame) , true)
                 .AddField("Wind", HandleMaxLength(wind), true)
                 
                 // empty line

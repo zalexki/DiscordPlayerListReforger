@@ -12,6 +12,7 @@ public class StringConverted
     public string data { get; set; }
     public int count { get; set; }
 }
+
 public static class RabbitToDiscordConverter
 {
     public static string GetPlayerFriendlyKills(ServerGameData data, int max)
@@ -28,6 +29,11 @@ public static class RabbitToDiscordConverter
 
             contentStringBuild.Append($"{player.FriendlyPlayerKills} | {player.FriendlyAiKills}");
             contentStringBuild.AppendLine();
+        }
+
+        if (contentStringBuild.Length == 0)
+        {
+            contentStringBuild.Append("empty");
         }
         
         return contentStringBuild.ToString();
@@ -49,6 +55,11 @@ public static class RabbitToDiscordConverter
             
             contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {player.Kills} | {player.Deaths}");
             contentStringBuild.AppendLine();
+        }
+        
+        if (contentStringBuild.Length == 0)
+        {
+            contentStringBuild.Append("empty");
         }
         
         return contentStringBuild.ToString();
@@ -88,6 +99,10 @@ public static class RabbitToDiscordConverter
         if (false == data.PlayerList?.Any())
         {
             contentStringBuild.Append("no players");
+        }
+        if (contentStringBuild.Length == 0)
+        {
+            contentStringBuild.Append("empty");
         }
 
         return new StringConverted { data = contentStringBuild.ToString(), count = i };
@@ -129,8 +144,11 @@ public static class RabbitToDiscordConverter
         contentStringBuild.Append($"IP: {data.ServerIp}");
         contentStringBuild.AppendLine();
         contentStringBuild.Append($"Runtime: {upTime}");
-        contentStringBuild.AppendLine();
-        contentStringBuild.Append($"Ping: {ping}");
+        if (ping != "N/A")
+        {
+            contentStringBuild.AppendLine();
+            contentStringBuild.Append($"Ping: {ping}");
+        }
 
         return contentStringBuild.ToString();
     }
