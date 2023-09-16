@@ -210,7 +210,7 @@ public class DiscordHelper
         catch (Exception e) 
         {
             _logger.LogError(e, "failed to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
-            memChan = null;
+            memChan.FirstMessageId = 0L;
         }
 
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
