@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using DiscordPlayerListConsumer.Models.Redis;
 using DiscordPlayerListShared.Converter;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -184,12 +185,7 @@ public class DiscordHelper
         catch (RateLimitedException e)
         {
             _logger.LogInformation("RateLimitedException SendMessage for chan {Name}", memChan.ChannelName);
-
-            if (e.Request.TimeoutAt == null)
-            {
-                await Task.Delay(100);
-            }
-
+            
             _memoryStorage.waitBeforeSendChannelMessage = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
             if (_memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds != 0)
             {
@@ -209,11 +205,12 @@ public class DiscordHelper
         }
         catch (TimeoutException e)
         {
-            _logger.LogWarning("TimeoutException to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
+            _logger.LogError("TimeoutException to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
         }
         catch (Exception e) 
         {
             _logger.LogError(e, "failed to modify msg for channel {ChanName} {ChanId}", memChan.ChannelName, memChan.ChannelId);
+            memChan = null;
         }
 
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
@@ -271,9 +268,13 @@ public class DiscordHelper
         {
             _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
             await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
-            _logger.LogInformation( "retried sendName for chan {Name} after {Time}ms", channelName, e.Request.TimeoutAt.Value.Offset);
+            _logger.LogInformation( "retried sendName for chan {Name} after {Time}ms", channelName, _memoryStorage.waitBeforeSendChannelName);
 
             await SendRateLimitSafeChannelName(chanText, channelName);
+        }
+        catch (TimeoutException e)
+        {
+            _logger.LogError("TimeoutException to modify msg for channel {ChanName}", channelName);
         }
         catch (Exception e)
         {
