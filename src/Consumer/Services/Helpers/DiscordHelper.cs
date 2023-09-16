@@ -60,7 +60,7 @@ public class DiscordHelper
             if (existingChannel != null && existingChannel.ComputedChannelName != channelName)
             {
                 await SendChannelName(chanText, data, channelName);
-                _logger.LogInformation("update channel name from {ComputedChannelName} to {ChannelName}", existingChannel.ComputedChannelName, channelName);
+                _logger.LogInformation("try update channel name from {ComputedChannelName} to {ChannelName}", existingChannel.ComputedChannelName, channelName);
                 existingChannel.ComputedChannelName = channelName;
             }
 
@@ -271,6 +271,7 @@ public class DiscordHelper
             
             await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromSeconds(5)));
             await SendRateLimitSafeChannelName(chanText, channelName);
+            _logger.LogInformation("success after retry update channel name {ChannelName}", channelName);
             return;
         }
         catch (TimeoutException e)
@@ -296,6 +297,8 @@ public class DiscordHelper
 
         _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
         retrySendName = 0;
+        _logger.LogInformation("success update channel name {ChannelName}", channelName);
+
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
