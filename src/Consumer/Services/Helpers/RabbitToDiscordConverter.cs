@@ -124,14 +124,7 @@ public static class RabbitToDiscordConverter
             }
         }
 
-        if (false == data.PlayerList?.Any())
-        {
-            contentStringBuild.Append("no players");
-        }
-        if (contentStringBuild.Length == 0)
-        {
-            contentStringBuild.Append("empty");
-        }
+        contentStringBuild.Append(false == data.PlayerList?.Any() ? "no players" : "and more ...");
 
         return new StringConverted { data = contentStringBuild.ToString(), count = i };
     }
