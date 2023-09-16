@@ -109,19 +109,21 @@ public static class RabbitToDiscordConverter
     {
         var contentStringBuild = new StringBuilder();
         var upTime = new TimeSpan(0, 0, 30, (int) data.UpTime);
-        string ping;
+        var ping = "N/A";
         try
         {
-            ping = PingTimeAverage(data.ServerIp.Split(":").First(), 3);
-            if (ping == "0")
+            if (data.ServerIp.Contains(":"))
             {
-                ping = "1";
+                ping = PingTimeAverage(data.ServerIp.Split(":").First(), 3);
+                if (ping == "0")
+                {
+                    ping = "1";
+                }
             }
         }
         catch (Exception e)
         {
             logger.LogError(e, "PingTimeAverage failed");
-            ping = "N/A";
         }
 
         contentStringBuild.Append($"IP: {data.ServerIp}");
