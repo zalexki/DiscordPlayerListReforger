@@ -22,7 +22,7 @@ public static class RabbitToDiscordConverter
         foreach (var player in data.PlayerList)
         {
             i++;
-            if (i > max)
+            if (i > 45)
             {
                 break;
             }
@@ -39,21 +39,45 @@ public static class RabbitToDiscordConverter
         return contentStringBuild.ToString();
     }
     
-    public static string GetPlayerExtras(ServerGameData data, int max)
+    public static string GetPlayerExtrasPlatformFaction(ServerGameData data, int max)
     {
         var contentStringBuild = new StringBuilder();
         var i = 0;
         foreach (var player in data.PlayerList)
         {
             i++;
-            if (i > max)
+            if (i > 45)
             {
                 break;
             }
             var emojiIconPlatform = player.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
             var factionEmoji = ResolveFactionKey(player.Faction);
             
-            contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {player.Kills} | {player.Deaths}");
+            contentStringBuild.Append($"{factionEmoji}");
+            contentStringBuild.AppendLine();
+        }
+        
+        if (contentStringBuild.Length == 0)
+        {
+            contentStringBuild.Append("empty");
+        }
+        
+        return contentStringBuild.ToString();
+    }
+    
+    public static string GetPlayerExtrasKillDeath(ServerGameData data, int max)
+    {
+        var contentStringBuild = new StringBuilder();
+        var i = 0;
+        foreach (var player in data.PlayerList)
+        {
+            i++;
+            if (i > 45)
+            {
+                break;
+            }
+            
+            contentStringBuild.Append($" {player.Kills} | {player.Deaths}");
             contentStringBuild.AppendLine();
         }
         
@@ -73,6 +97,10 @@ public static class RabbitToDiscordConverter
         foreach (var player in data.PlayerList)
         {
             i++;
+            if (i > 45)
+            {
+                break;
+            }
             
             if (contentStringBuild.Length + player.Name.Length >= DiscordHelper.DISCORD_FIELD_MAX_LENGTH)
             {

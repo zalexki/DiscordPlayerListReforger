@@ -65,7 +65,8 @@ public class DiscordHelper
             // update message
             var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
-            var playerExtra = RabbitToDiscordConverter.GetPlayerExtras(data, players.count);
+            //var playerExtraPlatformFaction = RabbitToDiscordConverter.GetPlayerExtrasPlatformFaction(data, players.count);
+            var playerExtraKillDeath = RabbitToDiscordConverter.GetPlayerExtrasKillDeath(data, players.count);
             var playerFriendlyKills = RabbitToDiscordConverter.GetPlayerFriendlyKills(data, players.count);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo, _logger);
             var wind = RabbitToDiscordConverter.GetWindData(data.ServerInfo);
@@ -79,7 +80,8 @@ public class DiscordHelper
                 
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players name", players.data, true)
-                .AddField("P | F | K | D ", playerExtra, true)
+                // .AddField("Faction ", playerExtraPlatformFaction, true)
+                .AddField("K | D ", playerExtraKillDeath, true)
                 .AddField("FP Kills | FA Kills", playerFriendlyKills, true)
                 .AddField("** **", "** **")
                 .AddField("Server", HandleMaxLength(server), true)
