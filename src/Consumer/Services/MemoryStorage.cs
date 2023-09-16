@@ -15,4 +15,5 @@ public class MemoryStorage
     
     public TimeSpan waitBeforeSendChannelName { get; set; }
     public TimeSpan waitBeforeSendChannelMessage { get; set; }
+    public TimeSpan waitBeforeGetChannel { get; set; }
 }

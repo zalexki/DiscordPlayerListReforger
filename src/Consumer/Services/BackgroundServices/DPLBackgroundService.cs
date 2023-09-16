@@ -12,12 +12,14 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
     private readonly ILogger<DplBackgroundService> _logger;
     private readonly DiscordHelper _discord;
     private readonly MemoryStorage _memoryStorage;
+    private readonly RedisStorage _redisStorage;
 
-    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, MemoryStorage memoryStorage)
+    public DplBackgroundService(ILogger<DplBackgroundService> logger, DiscordHelper discord, MemoryStorage memoryStorage, RedisStorage redisStorage)
     {
         _logger = logger;
         _discord = discord;
         _memoryStorage = memoryStorage;
+        _redisStorage = redisStorage;
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,7 +61,7 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
                 _logger.LogError(e, "failed to sendServerOff for {@DiscordChannelTracked}", discordChannelTracked);
             }
             
-            await Task.Delay(200);
+            _redisStorage.SaveIntoRedis(discordChannelTracked);
         }
     }
 }

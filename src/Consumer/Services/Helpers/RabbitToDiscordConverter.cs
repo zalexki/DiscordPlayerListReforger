@@ -3,29 +3,94 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using DiscordPlayerListShared.Models.Request;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
 
+public class StringConverted
+{
+    public string data { get; set; }
+    public int count { get; set; }
+}
 public static class RabbitToDiscordConverter
 {
-    public static string GetPlayerList(ServerGameData data)
+    public static string GetPlayerFriendlyKills(ServerGameData data, int max)
     {
         var contentStringBuild = new StringBuilder();
-
-        data.PlayerList?.ForEach(x =>
+        var i = 0;
+        foreach (var player in data.PlayerList)
         {
-            var emojiIconPlatform = x.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
-            var factionEmoji = ResolveFactionKey(x.Faction);
-            contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {x.Name}");
+            i++;
+            if (i > max)
+            {
+                break;
+            }
+
+            contentStringBuild.Append($"{player.FriendlyPlayerKills} | {player.FriendlyAiKills}");
             contentStringBuild.AppendLine();
-        });
+        }
         
+        return contentStringBuild.ToString();
+    }
+    
+    public static string GetPlayerExtras(ServerGameData data, int max)
+    {
+        var contentStringBuild = new StringBuilder();
+        var i = 0;
+        foreach (var player in data.PlayerList)
+        {
+            i++;
+            if (i > max)
+            {
+                break;
+            }
+            var emojiIconPlatform = player.Platform == "STEAM" ? "<:steam:1107786853874159737>" : "<:xbox:1107786791999787068>";
+            var factionEmoji = ResolveFactionKey(player.Faction);
+            
+            contentStringBuild.Append($"{emojiIconPlatform} | {factionEmoji} | {player.Kills} | {player.Deaths}");
+            contentStringBuild.AppendLine();
+        }
+        
+        return contentStringBuild.ToString();
+    }
+    
+    public static StringConverted GetPlayerList(ServerGameData data)
+    {
+        var contentStringBuild = new StringBuilder();
+        var andMoreText = "and more ...";
+        var i = 0;
+        foreach (var player in data.PlayerList)
+        {
+            i++;
+            
+            if (contentStringBuild.Length + player.Name.Length >= DiscordHelper.DISCORD_FIELD_MAX_LENGTH)
+            {
+                if (contentStringBuild.Length + andMoreText.Length >= DiscordHelper.DISCORD_FIELD_MAX_LENGTH)
+                {
+                    if (contentStringBuild.Length > DiscordHelper.DISCORD_FIELD_MAX_LENGTH - 3)
+                    {
+                        contentStringBuild.Append("...");
+                    }
+                }
+                else
+                {
+                    contentStringBuild.Append("and more ...");
+                }
+                break;
+            }
+            else
+            {
+                contentStringBuild.Append(player.Name);
+                contentStringBuild.AppendLine();
+            }
+        }
+
         if (false == data.PlayerList?.Any())
         {
             contentStringBuild.Append("no players");
         }
 
-        return contentStringBuild.ToString();
+        return new StringConverted { data = contentStringBuild.ToString(), count = i };
     }
 
     public static string GetWindData(ServerInfo data)
@@ -40,7 +105,7 @@ public static class RabbitToDiscordConverter
         return contentStringBuild.ToString();
     }
 
-    public static string GetServerData(ServerInfo data)
+    public static string GetServerData(ServerInfo data, ILogger logger)
     {
         var contentStringBuild = new StringBuilder();
         var upTime = new TimeSpan(0, 0, 30, (int) data.UpTime);
@@ -55,6 +120,7 @@ public static class RabbitToDiscordConverter
         }
         catch (Exception e)
         {
+            logger.LogError(e, "PingTimeAverage failed");
             ping = "N/A";
         }
 

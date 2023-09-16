@@ -32,6 +32,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<DiscordSocketClient>()
             
             .AddSingleton<DPLJsonConverter>()
+            .AddSingleton<RedisStorage>()
             .AddSingleton<MemoryStorage>()
 
             .AddTransient<DiscordHelper>()
