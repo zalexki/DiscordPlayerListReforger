@@ -177,8 +177,8 @@ public class DiscordHelper
                 });
 
             timer.Stop();
-            _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms",
-                memChan.ChannelId, timer.ElapsedMilliseconds);
+            _logger.LogInformation("perfProfile: {Try} send modify msg done for channelId {ChanId} in {Time}ms",
+                retrySendMessage, memChan.ChannelId, timer.ElapsedMilliseconds);
             
         }
         catch (RateLimitedException e)
@@ -253,6 +253,7 @@ public class DiscordHelper
         
         try
         {
+            var timer = Stopwatch.StartNew();
             await chanText.ModifyAsync(props => { props.Name = channelName; }, 
                 options: new RequestOptions
                 {
@@ -260,6 +261,9 @@ public class DiscordHelper
                     RetryMode = RetryMode.AlwaysFail,
                     RatelimitCallback = RateLimitedCallbackModifyName
                 });
+            timer.Stop();
+            _logger.LogInformation("perfProfile: {Try} modify channel name done for channelId {ChanId} in {Time}ms",
+                retrySendMessage, channelName, timer.ElapsedMilliseconds);
         }
         catch (RateLimitedException e)
         {
