@@ -79,11 +79,15 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             _logger.LogInformation("RabbitConsumer received: {RabbitMessage}", rabbitMessage);
 
             var data = JsonConvert.DeserializeObject<ServerGameData>(rabbitMessage);
+            
             if (data is null)
             {
                 _logger.LogError("failed to deserialize message: {RabbitMessage}", rabbitMessage);
                 return;
             }
+            
+            //order by friendly kills
+            data.PlayerList = data.PlayerList.OrderByDescending(x => x.FriendlyPlayerKills).ToList();
 
             if (IsInNotATextChannelList(data.DiscordChannelId))
             {
@@ -93,9 +97,6 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
 
             addOrUpdateChannelInRedis(data);
 
-            if (_memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds > 0) await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
-            if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds > 0) await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
-            
             if (await _discord.SendMessageFromGameData(data)) {
                 _logger.LogInformation("RabbitConsumer finished successfully to consume: {Id}", data.DiscordChannelId);
             } else {

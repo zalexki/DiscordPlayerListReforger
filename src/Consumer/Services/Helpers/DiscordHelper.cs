@@ -44,9 +44,7 @@ public class DiscordHelper
 
         var sw = Stopwatch.StartNew();
         var swCurrent = Stopwatch.StartNew();
-        //order by friendly kills
-        data.PlayerList = data.PlayerList.OrderByDescending(x => x.FriendlyPlayerKills).ToList();
-        
+
         try
         {
             var chanText = await GetTextChannel(data);
@@ -150,7 +148,7 @@ public class DiscordHelper
 
         return true;
     }
-    
+
     private async Task SendMessage(ITextChannel chanText, DiscordChannelTracked memChan, EmbedBuilder embed)
     {
         retrySendMessage++;
@@ -271,7 +269,6 @@ public class DiscordHelper
             
             await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromSeconds(5)));
             await SendRateLimitSafeChannelName(chanText, channelName);
-            _logger.LogInformation("success after retry update channel name {ChannelName}", channelName);
             return;
         }
         catch (TimeoutException e)
@@ -346,11 +343,11 @@ public class DiscordHelper
                 await SendMessage(chanText, memChan, embed);
             }
             sw.Stop();
-            _logger.LogInformation("finished to send server off discord msg in {0} ms", sw.ElapsedMilliseconds);
+            _logger.LogInformation("finished to send server off discord msg in {Time}ms", sw.ElapsedMilliseconds);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "failed to send server off discord msg {chan}", data.ChannelName);
+            _logger.LogError(e, "failed to send server off discord msg {Chan}", data.ChannelName);
             return false;
         }
         
@@ -464,7 +461,10 @@ public class DiscordHelper
     private async Task RateLimitedCallbackModifyMessage(IRateLimitInfo rateLimitInfo)
     {
         _logger.LogWarning("rate limited Message {infos}", JsonConvert.SerializeObject(rateLimitInfo, Formatting.Indented));
-        _memoryStorage.waitBeforeSendChannelMessage = rateLimitInfo.ResetAfter ?? new TimeSpan();
+        if (rateLimitInfo.Remaining == 1)
+        {
+            _memoryStorage.waitBeforeSendChannelMessage = rateLimitInfo.ResetAfter ?? new TimeSpan();
+        }
     }
     private async Task RateLimitedCallbackModifyName(IRateLimitInfo rateLimitInfo)
     {
