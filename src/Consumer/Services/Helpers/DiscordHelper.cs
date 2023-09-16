@@ -179,8 +179,7 @@ public class DiscordHelper
             timer.Stop();
             _logger.LogInformation("perfProfile: send modify msg done for channelId {ChanId} in {Time} ms",
                 memChan.ChannelId, timer.ElapsedMilliseconds);
-            _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
-            retrySendMessage = 0;
+            
         }
         catch (RateLimitedException e)
         {
@@ -201,7 +200,7 @@ public class DiscordHelper
             }
 
             await SendMessage(chanText, memChan, embed);
-            
+            return;
         }
         catch (TimeoutException e)
         {
@@ -214,6 +213,7 @@ public class DiscordHelper
         }
 
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
+        retrySendMessage = 0;
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
@@ -242,7 +242,7 @@ public class DiscordHelper
         if (retrySendName > 10)
         {
             _logger.LogWarning("stop retrySendName for chan {Name}", channelName);
-
+            retrySendName = 0;
             return;
         }
         
@@ -260,9 +260,6 @@ public class DiscordHelper
                     RetryMode = RetryMode.AlwaysFail,
                     RatelimitCallback = RateLimitedCallbackModifyName
                 });
-            
-            _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
-            retrySendName = 0;
         }
         catch (RateLimitedException e)
         {
@@ -271,6 +268,7 @@ public class DiscordHelper
             _logger.LogInformation( "retried sendName for chan {Name} after {Time}ms", channelName, _memoryStorage.waitBeforeSendChannelName);
 
             await SendRateLimitSafeChannelName(chanText, channelName);
+            return;
         }
         catch (TimeoutException e)
         {
@@ -282,6 +280,7 @@ public class DiscordHelper
         }
 
         _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
+        retrySendName = 0;
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
