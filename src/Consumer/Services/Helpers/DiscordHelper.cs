@@ -242,6 +242,11 @@ public class DiscordHelper
         if (retrySendName > 10)
         {
             _logger.LogWarning("stop retrySendName for chan {Name}", channelName);
+            var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
+            if (memChan is not null)
+            {
+                memChan.ChannelName = string.Empty;
+            }
             retrySendName = 0;
             return;
         }
@@ -277,10 +282,20 @@ public class DiscordHelper
         catch (TimeoutException e)
         {
             _logger.LogError("TimeoutException to modify msg for channel {ChanName}", channelName);
+            var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
+            if (memChan is not null)
+            {
+                memChan.ChannelName = string.Empty;
+            }
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "failed to sendName {Name}", channelName);
+            var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
+            if (memChan is not null)
+            {
+                memChan.ChannelName = string.Empty;
+            }
         }
 
         _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
