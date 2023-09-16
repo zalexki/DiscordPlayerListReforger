@@ -189,20 +189,14 @@ public class DiscordHelper
         catch (RateLimitedException e)
         {
             _logger.LogInformation("RateLimitedException SendMessage for chan {Name}", memChan.ChannelName);
+            if (_memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds == 0)
+            {
+                _memoryStorage.waitBeforeSendChannelMessage = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
+            }
             
-            _memoryStorage.waitBeforeSendChannelMessage = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
-            if (_memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds != 0)
-            {
-                await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
-                _logger.LogInformation("retried SendMessage for chan {Name} {Id} after {Time}ms", 
-                    memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds);
-            }
-            else
-            {
-                await Task.Delay(100);
-                _logger.LogInformation("retried SendMessage for chan {Name} {Id} after {Time}ms", 
-                    memChan.ChannelName, memChan.ChannelId, 100);
-            }
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
+            _logger.LogInformation("retried SendMessage for chan {Name} {Id} after {Time}ms", 
+                memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds);
 
             await SendMessage(chanText, memChan, embed);
             return;
@@ -275,8 +269,11 @@ public class DiscordHelper
         }
         catch (RateLimitedException e)
         {
-            _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
+            if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds == 0)
+            {
+                _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
+            }
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromMilliseconds(100)));
             _logger.LogInformation( "{RetrySendName} retried sendName for chan {Name} after {Time}ms", retrySendName, channelName, _memoryStorage.waitBeforeSendChannelName);
 
             await SendRateLimitSafeChannelName(chanText, channelName);
