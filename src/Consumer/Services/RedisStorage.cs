@@ -27,6 +27,27 @@ public class RedisStorage
         _jsonConverter = jsonConverter;
     }
     
+    public List<DiscordChannelTracked> GetFromRedisDiscordChannelTracked()
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
+        var keys = server.Keys(REDIS_DB).ToList();
+        
+        var results = keys
+            .Select(key => redisDb.StringGet(key))
+            .Select(redisData => (string) redisData)
+            .ToList();
+
+        var list = new List<DiscordChannelTracked>();
+        foreach (var res in results)
+        {
+            var obj = _jsonConverter.ToObject<DiscordChannelTracked>(res);
+            list.Add(obj);
+        }
+        
+        return list;
+    }
+    
     public void LoadFromRedisDiscordChannelTrackedIntoMemory()
     {
         var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);

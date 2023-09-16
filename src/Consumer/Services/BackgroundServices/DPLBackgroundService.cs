@@ -43,7 +43,7 @@ public class DplBackgroundService : Microsoft.Extensions.Hosting.BackgroundServi
     
     private async void DoWork()
     {
-        var list = _memoryStorage.DiscordChannels
+        var list = _redisStorage.GetFromRedisDiscordChannelTracked()
             .Where(x => x.IsUp && x.LastUpdate < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(5)));
 
         foreach (var discordChannelTracked in list)
