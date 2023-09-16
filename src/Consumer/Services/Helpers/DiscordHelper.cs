@@ -194,9 +194,10 @@ public class DiscordHelper
                 _memoryStorage.waitBeforeSendChannelMessage = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
             }
             
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage.Add(TimeSpan.FromSeconds(1)));
             _logger.LogInformation("retried SendMessage for chan {Name} {Id} after {Time}ms", 
                 memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds);
+            _logger.LogInformation("RateLimitedException {e} ", e);
 
             await SendMessage(chanText, memChan, embed);
             return;
@@ -269,12 +270,13 @@ public class DiscordHelper
         }
         catch (RateLimitedException e)
         {
-            if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds == 0)
+            if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds == 0 || retrySendName > 1)
             {
                 _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
             }
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromMilliseconds(100)));
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromSeconds(1)));
             _logger.LogInformation( "{RetrySendName} retried sendName for chan {Name} after {Time}ms", retrySendName, channelName, _memoryStorage.waitBeforeSendChannelName);
+            _logger.LogInformation("RateLimitedException {e} ", e);
 
             await SendRateLimitSafeChannelName(chanText, channelName);
             return;
