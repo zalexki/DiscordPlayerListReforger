@@ -44,6 +44,8 @@ public class DiscordHelper
 
         var sw = Stopwatch.StartNew();
         var swCurrent = Stopwatch.StartNew();
+        //order by friendly kills
+        data.PlayerList = data.PlayerList.OrderBy(x => x.FriendlyPlayerKills).ToList();
         
         try
         {

@@ -26,7 +26,7 @@ public class ServerGameData
     
     [Required]
     [JsonProperty("players")]
-    public required List<PlayerInfo> PlayerList { get; init; }
+    public required List<PlayerInfo> PlayerList { get; set; }
 }
 
 public class ServerInfo
