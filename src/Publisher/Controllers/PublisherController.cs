@@ -140,6 +140,8 @@ public class PublisherController : ControllerBase
             _logger.LogError(e, "failed to know if ChannelHasMissingAccess");
         }
 
+        _logger.LogInformation("ChannelHasMissingAccess {ChannelId}", channelId.ToString());
+
         return true;
     }
 }
