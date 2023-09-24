@@ -132,7 +132,7 @@ public class PublisherController : ControllerBase
             var data = await redisDb.StringGetAsync(channelId.ToString());
             if (data.IsNull)
             {
-                return false;
+                return true;
             }
         }  
         catch (Exception e) 
@@ -142,6 +142,6 @@ public class PublisherController : ControllerBase
 
         _logger.LogInformation("ChannelHasMissingAccess {ChannelId}", channelId.ToString());
 
-        return true;
+        return false;
     }
 }

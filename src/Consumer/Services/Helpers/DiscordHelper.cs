@@ -153,10 +153,11 @@ public class DiscordHelper
             if (e.DiscordCode == DiscordErrorCode.MissingPermissions)
             {
                 _logger.LogError(e, "failed to send discord msg, no perms");
-                _redisStorage.SaveIntoRedisMissingPerms(data.DiscordChannelId);
-                
-                return false;
+                _redisStorage.SaveIntoRedisMissingPerms(data.DiscordChannelId);    
             } 
+
+            _logger.LogError(e, "failed to send discord msg");
+            return false;
         }
         catch (Exception e)
         {
