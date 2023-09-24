@@ -86,16 +86,20 @@ public class PublisherController : ControllerBase
         
         if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
+            _logger.LogWarning("missing DiscordChannelId or DiscordChannelName");
             return Ok("missing DiscordChannelId or DiscordChannelName");
         }
 
-        if (await IsInNotATextChannelList(gameData.DiscordChannelId))
+        var isInNotATextChannelList = await IsInNotATextChannelList(gameData.DiscordChannelId);
+        if (isInNotATextChannelList)
         {
+            _logger.LogWarning("DiscordChannelId is not a text channel id");
             return Ok("DiscordChannelId is not a text channel id");
         }
-
-        if (await ChannelHasMissingAccess(gameData.DiscordChannelId))
+        var channelHasMissingAccess = await ChannelHasMissingAccess(gameData.DiscordChannelId);
+        if (channelHasMissingAccess)
         {
+            _logger.LogWarning("missing permissions channel id");
             return Ok("missing permissions channel id");
         }
         
