@@ -90,7 +90,7 @@ public class RedisStorage
 
     public void SaveIntoRedisMissingPerms(ulong id)
     {
-        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        var redisDb = _multiplexerRedis.GetDatabase(MissingAccessChannelIds.REDIS_DB);
         redisDb.StringSet(id.ToString(), "no perms", TimeSpan.FromMinutes(10));
     }
 
