@@ -86,12 +86,17 @@ public class PublisherController : ControllerBase
         
         if (gameData?.DiscordChannelId is null || gameData?.DiscordChannelName is null)
         {
-            return BadRequest("missing DiscordChannelId or DiscordChannelName");
+            return Ok("missing DiscordChannelId or DiscordChannelName");
         }
 
-        if (IsInNotATextChannelList(gameData.DiscordChannelId))
+        if (await IsInNotATextChannelList(gameData.DiscordChannelId))
         {
-            return BadRequest("DiscordChannelId is not a text channel id");
+            return Ok("DiscordChannelId is not a text channel id");
+        }
+
+        if (await ChannelHasMissingAccess(gameData.DiscordChannelId))
+        {
+            return Ok("missing permissions channel id");
         }
         
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
@@ -105,10 +110,10 @@ public class PublisherController : ControllerBase
         return Ok();
     }
 
-    private bool IsInNotATextChannelList(ulong id)
+    private async Task<bool> IsInNotATextChannelList(ulong id)
     {
         var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
-        var data = redisDb.StringGet(NotTextChannelIds.REDIS_KEY);
+        var data = await redisDb.StringGetAsync(NotTextChannelIds.REDIS_KEY);
         if (data.IsNull)
         {
             return false;
@@ -117,5 +122,24 @@ public class PublisherController : ControllerBase
         var obj = _jsonConverter.ToObject<NotTextChannelIds>(data);
         
         return obj.Ids is not null && obj.Ids.Contains(id);
+    }
+
+    private async Task<bool> ChannelHasMissingAccess(ulong channelId)
+    {
+        try
+        {
+            var redisDb = _multiplexerRedis.GetDatabase(MissingAccessChannelIds.REDIS_DB);
+            var data = await redisDb.StringGetAsync(channelId.ToString());
+            if (data.IsNull)
+            {
+                return false;
+            }
+        }  
+        catch (Exception e) 
+        {
+            _logger.LogError(e, "failed to know if ChannelHasMissingAccess");
+        }
+
+        return true;
     }
 }

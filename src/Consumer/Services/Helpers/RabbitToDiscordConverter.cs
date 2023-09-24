@@ -106,7 +106,7 @@ public static class RabbitToDiscordConverter
             {
                 if (contentStringBuild.Length + andMoreText.Length >= DiscordHelper.DISCORD_FIELD_MAX_LENGTH)
                 {
-                    if (contentStringBuild.Length > DiscordHelper.DISCORD_FIELD_MAX_LENGTH - 3)
+                    if (contentStringBuild.Length <= DiscordHelper.DISCORD_FIELD_MAX_LENGTH - 3)
                     {
                         contentStringBuild.Append("...");
                     }
@@ -155,7 +155,7 @@ public static class RabbitToDiscordConverter
         var ping = "N/A";
         try
         {
-            if (data.ServerIp.Contains(":"))
+            if (data.ServerIp.Contains(':'))
             {
                 ping = PingTimeAverage(data.ServerIp.Split(":").First(), 3);
                 if (ping == "0")

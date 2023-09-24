@@ -51,19 +51,22 @@ public class DiscordHelper
             if (chanText is null) return false;
 
             var playerCount = data.PlayerList.Count;
-            
+
             // update channel name
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
-            var existingChannel = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
+            var existingChannel =
+                _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
             if (existingChannel != null && existingChannel.ComputedChannelName != channelName)
             {
                 await SendChannelName(chanText, data, channelName);
-                _logger.LogInformation("try update channel name from {ComputedChannelName} to {ChannelName}", existingChannel.ComputedChannelName, channelName);
+                _logger.LogInformation("try update channel name from {ComputedChannelName} to {ChannelName}",
+                    existingChannel.ComputedChannelName, channelName);
                 existingChannel.ComputedChannelName = channelName;
             }
 
             // update message
-            var missionName = RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
+            var missionName =
+                RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
             //var playerExtraPlatformFaction = RabbitToDiscordConverter.GetPlayerExtrasPlatformFaction(data, players.count);
             var playerExtraKillDeath = RabbitToDiscordConverter.GetPlayerExtrasKillDeath(data, players.count);
@@ -74,10 +77,10 @@ public class DiscordHelper
             var embed = new EmbedBuilder();
             embed
                 .WithTitle($"-- {data.DiscordMessageTitle} -- [{playerCount}/{data.ServerInfo?.MaxPlayerCount}]")
-                
+
                 // empty line
                 .AddField("** **", "** **")
-                
+
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Server Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Active players name", players.data, true)
                 // .AddField("Faction ", playerExtraPlatformFaction, true)
@@ -85,15 +88,15 @@ public class DiscordHelper
                 .AddField("FP Kills | FA Kills", playerFriendlyKills, true)
                 .AddField("** **", "** **")
                 .AddField("Server", HandleMaxLength(server), true)
-                
+
                 // empty line
                 .AddField("** **", "** **")
-                
+
                 .AddField("▬▬▬▬▬▬▬▬▬▬ Mission Information ▬▬▬▬▬▬▬▬▬▬", "╰┈➤")
                 .AddField("Mission", HandleMaxLength(missionName), true)
-                .AddField("Time", HandleMaxLength(data.ServerInfo?.TimeInGame) , true)
+                .AddField("Time", HandleMaxLength(data.ServerInfo?.TimeInGame), true)
                 .AddField("Wind", HandleMaxLength(wind), true)
-                
+
                 // empty line
                 .AddField("** **", "** **")
 
@@ -105,18 +108,21 @@ public class DiscordHelper
             if (memChan is not null && memChan.FirstMessageId != 0L)
             {
                 await SendMessage(chanText, memChan, embed);
-            } 
+            }
             else
             {
                 await GetBotUserId();
-                
-                _logger.LogInformation("perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+
+                _logger.LogInformation(
+                    "perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms",
+                    data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Restart();
-                
+
                 var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
                 var botMessages = messages.Where(x => x.Author.Id == _memoryStorage.BotUserId).ToList();
-                
-                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time} ms", data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
+
+                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time} ms",
+                    data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Stop();
 
                 if (botMessages.Any())
@@ -132,17 +138,30 @@ public class DiscordHelper
                 }
                 else
                 {
-                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(), options: new RequestOptions() { Timeout = 25000, RetryMode = RetryMode.AlwaysRetry }));
+                    _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(),
+                        options: new RequestOptions() {Timeout = 25000, RetryMode = RetryMode.AlwaysRetry}));
                 }
             }
 
-            _logger.LogInformation("perfProfile: TOTAL channelId {ChanId} in {Time} ms", data.DiscordChannelId, sw.ElapsedMilliseconds);
+            _logger.LogInformation("perfProfile: TOTAL channelId {ChanId} in {Time} ms", data.DiscordChannelId,
+                sw.ElapsedMilliseconds);
             sw.Stop();
             swCurrent.Stop();
+        }
+        catch (HttpException e)
+        {
+            if (e.DiscordCode == DiscordErrorCode.MissingPermissions)
+            {
+                _logger.LogError(e, "failed to send discord msg, no perms");
+                _redisStorage.SaveIntoRedisMissingPerms(data.DiscordChannelId);
+                
+                return false;
+            } 
         }
         catch (Exception e)
         {
             _logger.LogError(e, "failed to send discord msg");
+            
             return false;
         }
 

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Discord;
 using DiscordPlayerListConsumer.Models;
 using DiscordPlayerListConsumer.Models.Redis;
@@ -83,6 +86,12 @@ public class RedisStorage
         }
 
         return new NotTextChannelIds(){ Ids = new List<ulong>() };
+    }
+
+    public void SaveIntoRedisMissingPerms(ulong id)
+    {
+        var redisDb = _multiplexerRedis.GetDatabase(NotTextChannelIds.REDIS_DB);
+        redisDb.StringSet(id.ToString(), "no perms", TimeSpan.FromMinutes(10));
     }
 
     public void SaveIntoRedis(DiscordChannelTracked obj)
