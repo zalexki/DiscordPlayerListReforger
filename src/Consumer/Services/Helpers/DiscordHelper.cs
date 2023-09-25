@@ -156,7 +156,7 @@ public class DiscordHelper
                 _redisStorage.SaveIntoRedisMissingPerms(data.DiscordChannelId);    
             } 
 
-            _logger.LogError(e, "failed to send discord msg");
+            _logger.LogError(e, "HttpException failed to send discord msg");
             return false;
         }
         catch (Exception e)
