@@ -286,6 +286,13 @@ public class DiscordHelper
                 _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
                 _logger.LogWarning("new waitBeforeSendChannelName is {Time}", _memoryStorage.waitBeforeSendChannelName);
             }
+
+            var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
+            if (memChan != null)
+            {
+                memChan.ChannelName = string.Empty;
+                _redisStorage.SaveIntoRedis(memChan);
+            }
             
             await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromSeconds(5)));
             await SendRateLimitSafeChannelName(chanText, channelName);

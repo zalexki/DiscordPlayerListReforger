@@ -42,16 +42,11 @@ public class PublisherController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostRabbitMsg()
     {
-        string content;
+        var content = "";
         try
         {
-            var firstParam = HttpContext.Request.Form.FirstOrDefault();
-            content = firstParam.Key;
-            if (firstParam.Value != string.Empty)
-            {
-                content += firstParam.Value;
-            }
-            
+            content = HttpContext.Request.Form.Aggregate(content, (current, param) => current + (param.Key + param.Value));
+
             _logger.LogInformation("received body: {Body}", content);
         }
         catch (Exception e)

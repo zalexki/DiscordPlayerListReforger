@@ -100,7 +100,7 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
             if (await _discord.SendMessageFromGameData(data)) {
                 _logger.LogInformation("RabbitConsumer finished successfully to consume: {Id}", data.DiscordChannelId);
             } else {
-                _logger.LogInformation("RabbitConsumer finished failed to consume: {Id}", data.DiscordChannelId);
+                _logger.LogWarning("RabbitConsumer finished failed to consume: {Id}", data.DiscordChannelId);
             }
         }
         catch (Exception e)
