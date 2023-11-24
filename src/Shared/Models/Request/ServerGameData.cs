@@ -84,21 +84,21 @@ public class PlayerInfo
 
     [Required]
     [JsonProperty("kills")]
-    public required int Kills { get; init; }
+    public required float Kills { get; init; }
     
     [Required]
     [JsonProperty("aiKills")]
-    public required int KillsAi { get; init; }
+    public required float KillsAi { get; init; }
     
     [Required]
     [JsonProperty("deaths")]
-    public required int Deaths { get; init; }
+    public required float Deaths { get; init; }
     
     [Required]
     [JsonProperty("friendlyPlayerKills")]
-    public required int FriendlyPlayerKills { get; init; }
+    public required float FriendlyPlayerKills { get; init; }
     
     [Required]
     [JsonProperty("friendlyAiKills")]
-    public required int FriendlyAiKills { get; init; }
+    public required float FriendlyAiKills { get; init; }
 }
