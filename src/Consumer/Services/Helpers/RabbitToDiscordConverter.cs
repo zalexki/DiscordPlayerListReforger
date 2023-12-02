@@ -76,8 +76,8 @@ public static class RabbitToDiscordConverter
             {
                 break;
             }
-            
-            contentStringBuild.Append($" {player.Kills} | {player.Deaths}");
+            var totalKills = Math.Round(player.Kills + player.KillsAi, MidpointRounding.AwayFromZero);
+            contentStringBuild.Append($" {totalKills} | {player.Deaths}");
             contentStringBuild.AppendLine();
         }
         
