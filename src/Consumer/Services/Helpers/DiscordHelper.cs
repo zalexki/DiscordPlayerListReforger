@@ -56,7 +56,7 @@ public class DiscordHelper
             var channelName = $"🟢{data.DiscordChannelName.Trim()}〔{playerCount}∕{data.ServerInfo?.MaxPlayerCount}〕";
             var existingChannel =
                 _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelId == data.DiscordChannelId);
-            if (existingChannel != null && existingChannel.ComputedChannelName != channelName)
+            if (existingChannel != null && existingChannel.ComputedChannelName != channelName && existingChannel.LastUpdate.AddMinutes(30) > DateTime.UtcNow)
             {
                 await SendChannelName(chanText, data, channelName);
                 _logger.LogInformation("try update channel name from {ComputedChannelName} to {ChannelName}",
@@ -184,7 +184,7 @@ public class DiscordHelper
             memChan.ChannelName, 
             _memoryStorage.waitBeforeSendChannelMessage);
 
-            try
+        try
         {
             var timer = Stopwatch.StartNew();
             await chanText.ModifyMessageAsync(memChan.FirstMessageId, func:
