@@ -36,7 +36,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<MemoryStorage>()
 
             .AddTransient<DiscordHelper>()
-
+            
             .AddHostedService<RabbitConsumer>()
             .AddHostedService<DplBackgroundService>();
     })
@@ -51,4 +51,7 @@ var host = Host.CreateDefaultBuilder(args)
     )
     .Build();
 
-host.Run();
+// TableToImageHelper.GenerateImageTable();
+
+// host.Run();
+

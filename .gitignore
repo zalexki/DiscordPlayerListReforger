@@ -21,3 +21,6 @@ bld/
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
+
+.DS_Store
+*.jpg
