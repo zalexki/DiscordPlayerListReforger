@@ -53,5 +53,5 @@ var host = Host.CreateDefaultBuilder(args)
 
 // TableToImageHelper.GenerateImageTable();
 
-// host.Run();
+host.Run();
 
