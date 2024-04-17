@@ -4,6 +4,9 @@ help:
 # target: up                                     - Start rabbit in docker container
 up: 
 	docker-compose up -d
+# target: down                                     - Stop rabbit in docker container
+down: 
+	docker-compose down
 
 # target: pu|prod-up                             - Start dotnet worker and rabbit in docker containers
 pu: prod-up

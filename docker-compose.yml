@@ -51,6 +51,8 @@ services:
       - RABBIT_PASSWORD=guest
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
+      - REDIS_HOST=guest
+      - REDIS_PASS=guest
 
 volumes:
     redis-data-volume:
