@@ -15,7 +15,7 @@ public class StringConverted
 
 public static class RabbitToDiscordConverter
 {
-    public static string GetPlayerFriendlyKills(ServerGameData data, int max)
+    public static string GetPlayerFriendlyKills(ServerGameData data)
     {
         var contentStringBuild = new StringBuilder();
         var i = 0;
@@ -27,7 +27,9 @@ public static class RabbitToDiscordConverter
                 break;
             }
 
-            contentStringBuild.Append($"{player.TeamKills}");
+
+            var ratio = Math.Round(player.KillsDeathRatio, 2, MidpointRounding.AwayFromZero);
+            contentStringBuild.Append($"{player.TeamKills} | {ratio}");
             contentStringBuild.AppendLine();
         }
 
@@ -39,7 +41,7 @@ public static class RabbitToDiscordConverter
         return contentStringBuild.ToString();
     }
     
-    public static string GetPlayerExtrasPlatformFaction(ServerGameData data, int max)
+    public static string GetPlayerExtrasPlatformFaction(ServerGameData data)
     {
         var contentStringBuild = new StringBuilder();
         var i = 0;
@@ -65,7 +67,7 @@ public static class RabbitToDiscordConverter
         return contentStringBuild.ToString();
     }
     
-    public static string GetPlayerExtrasKillDeath(ServerGameData data, int max)
+    public static string GetPlayerExtrasKillDeath(ServerGameData data)
     {
         var contentStringBuild = new StringBuilder();
         var i = 0;
