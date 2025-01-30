@@ -1,9 +1,7 @@
-// using System;
 // using System.Collections.Generic;
 // using DiscordPlayerListShared.Models.Request;
 // using SixLabors.ImageSharp;
 // using TableToImageExport;
-// using TableToImageExport.DataStructures;
 
 // namespace DiscordPlayerListConsumer.Services.Helpers;
 
@@ -50,8 +48,24 @@
 //             Console.WriteLine(e);
 //             return false;
 
-//         }
-        
-//         return true;
-//     }
+    //     return bitmap;
+    // }
+
+    // generate an image from html table
+    // public static Image GenerateTable(string html)
+    // {
+    //     var generator = new TableGenerator();
+    //     generator.LoadFromHtml(html);
+    //     var bitmap = generator.ExportTableToImage();
+
+    //     return bitmap;
+    // }
+
+    // // generate an html table from a list of PlayerInfo objects 
+    // public static string GenerateTable(List<PlayerInfo> players)
+    //  {
+    //      var generator = new TableGenerator();
+    //      generator.LoadFromObjects<PlayerInfo>(players, x => x.Kills);
+    //      return generator.ExportTableToHtml();
+    //  }
 // }

@@ -86,8 +86,11 @@ public class RabbitConsumer : Microsoft.Extensions.Hosting.BackgroundService
                 return;
             }
             
-            //order by friendly kills
-            data.PlayerList = data.PlayerList.OrderByDescending(x => x.FriendlyPlayerKills).ToList();
+            //order list
+            data.PlayerList = data.PlayerList
+                .OrderByDescending(x => x.TeamKills)
+                .ThenByDescending(X => X.KillsDeathRatio)
+                .ToList();
 
             if (IsInNotATextChannelList(data.DiscordChannelId))
             {

@@ -23,18 +23,13 @@ public class PlayerInfo
     public required float Kills { get; init; }
     
     [Required]
-    [JsonProperty("aiKills")]
-    public required float KillsAi { get; init; }
-    
-    [Required]
     [JsonProperty("deaths")]
     public required float Deaths { get; init; }
     
     [Required]
-    [JsonProperty("friendlyPlayerKills")]
-    public required float FriendlyPlayerKills { get; init; }
-    
-    [Required]
-    [JsonProperty("friendlyAiKills")]
-    public required float FriendlyAiKills { get; init; }
+    [JsonProperty("teamKills")]
+    public required float TeamKills { get; init; }
+
+    [JsonIgnore]
+    public float KillsDeathRatio => Deaths == 0 ? Kills : Kills / Deaths;
 }

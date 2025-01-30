@@ -27,7 +27,7 @@ public static class RabbitToDiscordConverter
                 break;
             }
 
-            contentStringBuild.Append($"{player.FriendlyPlayerKills} | {player.FriendlyAiKills}");
+            contentStringBuild.Append($"{player.TeamKills}");
             contentStringBuild.AppendLine();
         }
 
@@ -76,8 +76,8 @@ public static class RabbitToDiscordConverter
             {
                 break;
             }
-            var totalKills = Math.Round(player.Kills + player.KillsAi, MidpointRounding.AwayFromZero);
-            contentStringBuild.Append($" {totalKills} | {player.Deaths}");
+
+            contentStringBuild.Append($" {player.Kills} | {player.Deaths}");
             contentStringBuild.AppendLine();
         }
         

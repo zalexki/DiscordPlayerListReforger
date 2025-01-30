@@ -24,3 +24,5 @@ BenchmarkDotNet.Artifacts/
 
 .DS_Store
 *.jpg
+# VSCode stuff ?
+.vs
