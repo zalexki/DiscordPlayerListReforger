@@ -68,9 +68,9 @@ public class DiscordHelper
             var missionName =
                 RabbitToDiscordConverter.ResolveShittyBohemiaMissionName(data.ServerInfo?.MissionName ?? string.Empty);
             var players = RabbitToDiscordConverter.GetPlayerList(data);
-            //var playerExtraPlatformFaction = RabbitToDiscordConverter.GetPlayerExtrasPlatformFaction(data, players.count);
-            var playerExtraKillDeath = RabbitToDiscordConverter.GetPlayerExtrasKillDeath(data, players.count);
-            var playerFriendlyKills = RabbitToDiscordConverter.GetPlayerFriendlyKills(data, players.count);
+            //var playerExtraPlatformFaction = RabbitToDiscordConverter.GetPlayerExtrasPlatformFaction(data);
+            var playerExtraKillDeath = RabbitToDiscordConverter.GetPlayerExtrasKillDeath(data);
+            var playerFriendlyKills = RabbitToDiscordConverter.GetPlayerFriendlyKills(data);
             var server = RabbitToDiscordConverter.GetServerData(data.ServerInfo, _logger);
             var wind = RabbitToDiscordConverter.GetWindData(data.ServerInfo);
 
