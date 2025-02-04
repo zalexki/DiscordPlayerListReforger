@@ -1,14 +1,14 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
-using DiscordPlayerListShared.Models.Request;
-using DiscordPlayerListConsumer.Models;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Discord;
 using Discord.Net;
+using Discord.WebSocket;
+using DiscordPlayerListShared.Models.Redis;
+using DiscordPlayerListShared.Models.Request;
 using Newtonsoft.Json;
 
 namespace DiscordPlayerListConsumer.Services.Helpers;
@@ -21,6 +21,8 @@ public class DiscordHelper
     private readonly RedisStorage _redisStorage;
     private int retrySendName;
     private int retrySendMessage;
+
+    private double totalWaited;
     public const int DISCORD_FIELD_MAX_LENGTH = 1024;
 
 
@@ -139,7 +141,7 @@ public class DiscordHelper
                 else
                 {
                     _ = Task.Run(() => chanText.SendMessageAsync(embed: embed.Build(),
-                        options: new RequestOptions() {Timeout = 25000, RetryMode = RetryMode.AlwaysRetry}));
+                        options: new RequestOptions() {Timeout = 5000, RetryMode = RetryMode.AlwaysRetry}));
                 }
             }
 
@@ -210,7 +212,9 @@ public class DiscordHelper
                 _logger.LogWarning("new waitBeforeSendChannelMessage is {Time}", _memoryStorage.waitBeforeSendChannelMessage);
             }
             
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage.Add(TimeSpan.FromSeconds(6)));
+            _memoryStorage.waitBeforeSendChannelMessage.Add(TimeSpan.FromSeconds(6));
+            totalWaited += _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds;
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
             await SendMessage(chanText, memChan, embed);
             return;
         }
@@ -225,8 +229,10 @@ public class DiscordHelper
             _redisStorage.SaveIntoRedis(memChan);
         }
 
+        _logger.LogWarning("perfProfile: totalWaited for {chanName} {ChanId} is {Time}", memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage);
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
         retrySendMessage = 0;
+        totalWaited = 0;
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)

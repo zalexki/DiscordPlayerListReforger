@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Discord;
-using DiscordPlayerListConsumer.Models;
+using DiscordPlayerListShared.Models.Redis;
 
 namespace DiscordPlayerListConsumer.Services;
 

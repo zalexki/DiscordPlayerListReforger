@@ -1,22 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Discord;
-using DiscordPlayerListConsumer.Models;
-using DiscordPlayerListConsumer.Models.Redis;
-using DiscordPlayerListConsumer.Services.BackgroundServices;
-using DiscordPlayerListShared.Converter;
 using Microsoft.Extensions.Logging;
+using DiscordPlayerListShared.Converter;
+using DiscordPlayerListShared.Models.Redis;
+
 using StackExchange.Redis;
 
 namespace DiscordPlayerListConsumer.Services;
 
 public class RedisStorage
 {
-    private const int REDIS_DB = 1;
     private readonly MemoryStorage _memoryStorage;
     private readonly IConnectionMultiplexer _multiplexerRedis;
     private readonly ILogger<RedisStorage> _logger;
@@ -29,12 +23,12 @@ public class RedisStorage
         _logger = logger;
         _jsonConverter = jsonConverter;
     }
-    
+
     public List<DiscordChannelTracked> GetFromRedisDiscordChannelTracked()
     {
-        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var redisDb = _multiplexerRedis.GetDatabase(DiscordChannelTracked.REDIS_DB);
         var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
-        var keys = server.Keys(REDIS_DB).ToList();
+        var keys = server.Keys(DiscordChannelTracked.REDIS_DB).ToList();
         
         var results = keys
             .Select(key => redisDb.StringGet(key))
@@ -53,9 +47,9 @@ public class RedisStorage
     
     public void LoadFromRedisDiscordChannelTrackedIntoMemory()
     {
-        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var redisDb = _multiplexerRedis.GetDatabase(DiscordChannelTracked.REDIS_DB);
         var server = _multiplexerRedis.GetServer(redisDb.IdentifyEndpoint() ?? _multiplexerRedis.GetEndPoints()[0]);
-        var keys = server.Keys(REDIS_DB).ToList();
+        var keys = server.Keys(DiscordChannelTracked.REDIS_DB).ToList();
         
         var results = keys
             .Select(key => redisDb.StringGet(key))
@@ -96,7 +90,7 @@ public class RedisStorage
 
     public void SaveIntoRedis(DiscordChannelTracked obj)
     {
-        var redisDb = _multiplexerRedis.GetDatabase(REDIS_DB);
+        var redisDb = _multiplexerRedis.GetDatabase(DiscordChannelTracked.REDIS_DB);
         var json = _jsonConverter.FromObject(obj);
         redisDb.StringSet(obj.ChannelId.ToString(), json, TimeSpan.FromDays(7));
     }

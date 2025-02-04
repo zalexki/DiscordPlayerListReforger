@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DiscordPlayerListConsumer.Models.Redis;
+namespace DiscordPlayerListShared.Models.Redis;
 
 public class NotTextChannelIds
 {

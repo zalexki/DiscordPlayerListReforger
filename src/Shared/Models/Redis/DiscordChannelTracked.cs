@@ -1,11 +1,12 @@
 using System;
-using Discord;
 using Newtonsoft.Json;
 
-namespace DiscordPlayerListConsumer.Models;
+namespace DiscordPlayerListShared.Models.Redis;
 
 public class DiscordChannelTracked
 {
+    public const int REDIS_DB = 1;
+
     [JsonProperty("isUp")]
     public required bool IsUp { get; set; }
     

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DiscordPlayerListConsumer.Models.Redis;
+using DiscordPlayerListShared.Models.Redis;
 using DiscordPlayerListShared.Models.Request;
 using DiscordPlayerListShared.Services;
 using DiscordPlayerListShared.Converter;
@@ -97,7 +97,14 @@ public class PublisherController : ControllerBase
             _logger.LogWarning("missing permissions channel id");
             return Ok("missing permissions channel id");
         }
-        
+
+        var channelUpdateTooFast = await ChannelUpdateIsTooFast(gameData.DiscordChannelId);
+        if (channelUpdateTooFast)
+        {
+            _logger.LogWarning("tried to update channel too fast for {chanId}", gameData?.DiscordChannelId);
+            return Ok("FAILED !! tried to update channel too fast");
+        }
+
         _rabbit.Channel.BasicPublish(exchange: string.Empty,
             routingKey: ServerGameData.QueueName,
             basicProperties: null,
@@ -142,5 +149,34 @@ public class PublisherController : ControllerBase
         _logger.LogInformation("ChannelHasMissingAccess {ChannelId}", channelId.ToString());
 
         return true;
+    }
+
+    private async Task<bool> ChannelUpdateIsTooFast(ulong channelId)
+    {
+        try
+        {
+            var redisDb = _multiplexerRedis.GetDatabase(DiscordChannelTracked.REDIS_DB);
+            var data = await redisDb.StringGetAsync(channelId.ToString());
+            if (!data.IsNull)
+            {
+                var obj = _jsonConverter.ToObject<DiscordChannelTracked>(data.ToString());
+                if (obj is not null)
+                {
+                    var span = DateTime.UtcNow - obj.LastUpdate;
+                    if (span.TotalMinutes < 5)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }  
+        catch (Exception e) 
+        {
+            _logger.LogError(e, "failed to know if ChannelUpdateIsTooFast");
+        }
+
+        _logger.LogInformation("ChannelUpdateIsTooFast {ChannelId}", channelId.ToString());
+
+        return false;
     }
 }

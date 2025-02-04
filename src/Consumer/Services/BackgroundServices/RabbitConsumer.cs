@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DiscordPlayerListShared.Models.Request;
-using DiscordPlayerListConsumer.Models;
 using DiscordPlayerListConsumer.Services.Helpers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,7 +12,7 @@ using RabbitMQ.Client.Events;
 using DiscordPlayerListShared.Services;
 using StackExchange.Redis;
 using DiscordPlayerListShared.Converter;
-using DiscordPlayerListConsumer.Models.Redis;
+using DiscordPlayerListShared.Models.Redis;
 
 namespace DiscordPlayerListConsumer.Services.BackgroundServices;
 

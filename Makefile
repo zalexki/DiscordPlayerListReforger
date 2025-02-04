@@ -11,6 +11,7 @@ down:
 # target: pu|prod-up                             - Start dotnet worker and rabbit in docker containers
 pu: prod-up
 prod-up: 
+	git pull
 	docker compose -f docker-compose.prod.yml up -d --build
 
 # target: ps|prod-stop                           - Start dotnet worker and rabbit in docker containers
