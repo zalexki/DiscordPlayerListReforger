@@ -163,8 +163,9 @@ public class PublisherController : ControllerBase
                 if (obj is not null)
                 {
                     var span = DateTime.UtcNow - obj.LastUpdate;
-                    if (span.TotalMinutes < 5)
+                    if (span.TotalMinutes < 4)
                     {
+                        _logger.LogInformation("ChannelUpdateIsTooFast {ChannelId} {span}", channelId.ToString(), span);
                         return true;
                     }
                 }
@@ -174,8 +175,6 @@ public class PublisherController : ControllerBase
         {
             _logger.LogError(e, "failed to know if ChannelUpdateIsTooFast");
         }
-
-        _logger.LogInformation("ChannelUpdateIsTooFast {ChannelId}", channelId.ToString());
 
         return false;
     }
