@@ -105,8 +105,8 @@ public class PublisherController : ControllerBase
             mandatory: true);
         
         _logger.LogInformation("success sent json to rabbit");
-    
-        return Ok();
+
+        return Ok($"OK received {gameData.DiscordChannelName} for {gameData.DiscordChannelId} at {DateTime.UtcNow}");
     }
 
     private async Task<bool> IsInNotATextChannelList(ulong id)
