@@ -170,7 +170,7 @@ public class PublisherController : ControllerBase
                     }
                 }
             }
-        }  
+        }
         catch (Exception e) 
         {
             _logger.LogError(e, "failed to know if ChannelUpdateIsTooFast");
