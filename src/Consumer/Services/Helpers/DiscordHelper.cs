@@ -211,8 +211,7 @@ public class DiscordHelper
                 _memoryStorage.waitBeforeSendChannelMessage = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
                 _logger.LogWarning("new waitBeforeSendChannelMessage is {Time}", _memoryStorage.waitBeforeSendChannelMessage);
             }
-            
-            _memoryStorage.waitBeforeSendChannelMessage.Add(TimeSpan.FromSeconds(6));
+
             totalWaited += _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds;
             await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
             await SendMessage(chanText, memChan, embed);
@@ -266,7 +265,11 @@ public class DiscordHelper
             retrySendName = 0;
             return;
         }
-        
+
+        _logger.LogInformation("perfProfile: SendRateLimitSafeChannelName for chan {channelName} in {Time}ms",
+            channelName,
+            _memoryStorage.waitBeforeSendChannelName);
+
         await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
 
         try
@@ -290,7 +293,7 @@ public class DiscordHelper
             if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds == 0 || retrySendName > 1)
             {
                 _memoryStorage.waitBeforeSendChannelName = e.Request.TimeoutAt - DateTime.UtcNow ?? new TimeSpan();
-                _logger.LogWarning("new waitBeforeSendChannelName is {Time}", _memoryStorage.waitBeforeSendChannelName);
+                _logger.LogWarning("new waitBeforeSendChannelName for chan {Name} is {Time}", channelName, _memoryStorage.waitBeforeSendChannelName);
             }
 
             var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
@@ -300,13 +303,14 @@ public class DiscordHelper
                 _redisStorage.SaveIntoRedis(memChan);
             }
             
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelName.Add(TimeSpan.FromSeconds(5)));
+            _logger.LogWarning("RateLimitedException wait for chan {Name} is {Time}", channelName, _memoryStorage.waitBeforeSendChannelName);
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
             await SendRateLimitSafeChannelName(chanText, channelName);
             return;
         }
         catch (TimeoutException e)
         {
-            _logger.LogError("TimeoutException to modify msg for channel {ChanName}", channelName);
+            _logger.LogError(e, "TimeoutException to modify msg for channel {ChanName}", channelName);
             var memChan = _memoryStorage.DiscordChannels.SingleOrDefault(x => x.ChannelName == channelName);
             if (memChan != null)
             {
