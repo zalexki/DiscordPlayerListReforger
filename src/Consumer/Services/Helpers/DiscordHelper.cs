@@ -337,7 +337,7 @@ public class DiscordHelper
             }
         }
 
-        _logger.LogInformation("perfProfile: success in {Try} modified {ChannelName} in {Time}ms", retrySendName, channelName, totalWaitedSendChanName);
+        _logger.LogInformation("perfProfile: totalWaitedSendChanName success in {Try} tries for {ChannelName} in {Time}ms", retrySendName, channelName, totalWaitedSendChanName);
         _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
         totalWaitedSendChanName = 0;
         retrySendName = 0;
