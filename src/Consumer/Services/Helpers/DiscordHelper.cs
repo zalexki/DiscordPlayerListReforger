@@ -118,14 +118,14 @@ public class DiscordHelper
                 await GetBotUserId();
 
                 _logger.LogInformation(
-                    "perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time} ms",
+                    "perfProfile: _client.CurrentUser is null done for channelId {ChanId} in {Time}ms",
                     data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Restart();
 
                 var messages = await chanText.GetMessagesAsync(10).FlattenAsync();
                 var botMessages = messages.Where(x => x.Author.Id == _memoryStorage.BotUserId).ToList();
 
-                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time} ms",
+                _logger.LogInformation("perfProfile: retrieve first msg done for channelId {ChanId} in {Time}ms",
                     data.DiscordChannelId, swCurrent.ElapsedMilliseconds);
                 swCurrent.Stop();
 
@@ -147,7 +147,7 @@ public class DiscordHelper
                 }
             }
 
-            _logger.LogInformation("perfProfile: TOTAL channelId {ChanId} in {Time} ms", data.DiscordChannelId,
+            _logger.LogInformation("perfProfile: TOTAL channelId {ChanId} in {Time}ms", data.DiscordChannelId,
                 sw.ElapsedMilliseconds);
             sw.Stop();
             swCurrent.Stop();
@@ -231,7 +231,7 @@ public class DiscordHelper
             _redisStorage.SaveIntoRedis(memChan);
         }
 
-        _logger.LogWarning("perfProfile: totalWaitedSendMsg for msg {chanName} {ChanId} is {Time}", memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage);
+        _logger.LogWarning("perfProfile: totalWaitedSendMsg for msg {chanName} {ChanId} is {Time}ms", memChan.ChannelName, memChan.ChannelId, totalWaitedSendMsg);
         
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
         retrySendMessage = 0;
