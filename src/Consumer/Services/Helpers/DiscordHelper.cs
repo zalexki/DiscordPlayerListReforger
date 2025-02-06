@@ -22,7 +22,9 @@ public class DiscordHelper
     private int retrySendName;
     private int retrySendMessage;
 
-    private double totalWaited;
+    private double totalWaitedSendMsg;
+    private double totalWaitedSendChanName;
+    
     public const int DISCORD_FIELD_MAX_LENGTH = 1024;
 
 
@@ -212,7 +214,8 @@ public class DiscordHelper
                 _logger.LogWarning("new waitBeforeSendChannelMessage is {Time}", _memoryStorage.waitBeforeSendChannelMessage);
             }
 
-            totalWaited += _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds;
+            totalWaitedSendMsg += _memoryStorage.waitBeforeSendChannelMessage.TotalMilliseconds;
+            
             await Task.Delay(_memoryStorage.waitBeforeSendChannelMessage);
             await SendMessage(chanText, memChan, embed);
             return;
@@ -228,10 +231,12 @@ public class DiscordHelper
             _redisStorage.SaveIntoRedis(memChan);
         }
 
-        _logger.LogWarning("perfProfile: totalWaited for {chanName} {ChanId} is {Time}", memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage);
+        _logger.LogWarning("perfProfile: totalWaitedSendMsg for msg {chanName} {ChanId} is {Time}", memChan.ChannelName, memChan.ChannelId, _memoryStorage.waitBeforeSendChannelMessage);
+        
         _memoryStorage.waitBeforeSendChannelMessage = new TimeSpan();
         retrySendMessage = 0;
-        totalWaited = 0;
+        totalWaitedSendMsg = 0;
+        
     }
     
     private async Task SendChannelName(ITextChannel chanText, ServerGameData data, string channelName)
@@ -266,11 +271,14 @@ public class DiscordHelper
             return;
         }
 
-        _logger.LogInformation("perfProfile: SendRateLimitSafeChannelName for chan {channelName} in {Time}ms",
-            channelName,
-            _memoryStorage.waitBeforeSendChannelName);
+        if (_memoryStorage.waitBeforeSendChannelName.TotalMilliseconds > 0)
+        {
+            _logger.LogInformation("perfProfile: SendRateLimitSafeChannelName for chan {channelName} in {Time}ms",
+                channelName,
+                _memoryStorage.waitBeforeSendChannelName);
 
-        await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
+            await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
+        }
 
         try
         {
@@ -303,8 +311,8 @@ public class DiscordHelper
                 _redisStorage.SaveIntoRedis(memChan);
             }
             
-            _logger.LogWarning("RateLimitedException wait for chan {Name} is {Time}", channelName, _memoryStorage.waitBeforeSendChannelName);
-            await Task.Delay(_memoryStorage.waitBeforeSendChannelName);
+            _logger.LogWarning("RateLimitedException wait for chan {Name} timespan is {Time}", channelName, _memoryStorage.waitBeforeSendChannelName);
+            totalWaitedSendChanName += _memoryStorage.waitBeforeSendChannelName.TotalMilliseconds;
             await SendRateLimitSafeChannelName(chanText, channelName);
             return;
         }
@@ -329,10 +337,10 @@ public class DiscordHelper
             }
         }
 
+        _logger.LogInformation("perfProfile: success in {Try} modified {ChannelName} in {Time}ms", retrySendName, channelName, totalWaitedSendChanName);
         _memoryStorage.waitBeforeSendChannelName = new TimeSpan();
+        totalWaitedSendChanName = 0;
         retrySendName = 0;
-        _logger.LogInformation("success update channel name {ChannelName}", channelName);
-
     }
 
     public async Task<bool> SendServerOffFromTrackedChannels(DiscordChannelTracked data)
